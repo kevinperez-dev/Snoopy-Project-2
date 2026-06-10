@@ -1,0 +1,38 @@
+# Blueprint opcional para Render.
+# Puedes usarlo desde Render > New > Blueprint si vas a crear backend y PostgreSQL juntos.
+# Si prefieres hacerlo manualmente, usa los valores del README_DEPLOY_RENDER_VERCEL.md.
+
+services:
+  - type: web
+    runtime: node
+    name: snoopy-project-2-backend
+    rootDir: snoopy-project-2-backend
+    plan: free
+    buildCommand: npm install && npm run db:setup
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DB_SSL
+        value: true
+      - key: JWT_SECRET
+        generateValue: true
+      - key: FRONTEND_URL
+        sync: false
+      - key: ADMIN_USERNAME
+        value: Snoopy
+      - key: ADMIN_PASSWORD
+        value: "2001"
+      - key: ADMIN_ROLE
+        value: admin
+      - key: DATABASE_URL
+        fromDatabase:
+          name: snoopy-project-2-db
+          property: connectionString
+
+databases:
+  - name: snoopy-project-2-db
+    databaseName: snoopy_project_2
+    user: snoopy_project_2_user
+    plan: free

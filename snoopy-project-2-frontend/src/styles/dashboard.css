@@ -1,0 +1,17 @@
+/* Página principal del dashboard */
+.dashboard-page {
+  padding: 32px;
+}
+
+/* Encabezado principal */
+.dashboard-header {
+  margin-bottom: 24px;
+}
+
+/* Tarjeta de contenido */
+.dashboard-card {
+  background: white;
+  padding: 24px;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+}

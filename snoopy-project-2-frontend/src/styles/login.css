@@ -1,0 +1,72 @@
+/* Archivo: src/styles/login.css */
+/* Propósito: estilos exclusivos del login con fondo estable */
+
+.login-wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+
+  /* Fondo aplicado directamente al contenedor del login */
+  background:
+    linear-gradient(
+      rgba(16, 16, 16, 0.55),
+      rgba(16, 16, 16, 0.55)
+    ),
+    url('/snoopy-desktop.png');
+
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+/* Tarjeta central del login */
+.login-card {
+  width: 100%;
+  max-width: 420px;
+  background: rgba(255, 255, 255, 0.94);
+  padding: 32px;
+  border-radius: 18px;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(6px);
+}
+
+/* Título del sistema */
+.login-card h1 {
+  margin: 0;
+  font-size: 28px;
+}
+
+/* Texto descriptivo */
+.login-card p {
+  color: #6b7280;
+  margin-bottom: 24px;
+}
+
+/* Formulario del login */
+.login-card form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Campos del formulario */
+.login-card input {
+  padding: 12px 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+}
+
+/* Botón de acceso */
+.login-card button {
+  margin-top: 12px;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  background: #1e3a8a;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+}

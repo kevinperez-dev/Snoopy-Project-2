@@ -1,0 +1,5374 @@
+/* =========================================================
+   RESET GENERAL
+========================================================= */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   VARIABLES DE DISEÑO
+========================================================= */
+:root {
+  --color-black: #101010;
+  --color-black-soft: #1a1a1a;
+  --color-gold: #b89645;
+  --color-gold-soft: #c4a357;
+  --color-bg: #efefef;
+  --color-card: #ffffff;
+  --color-border: #d8d8d8;
+  --color-border-soft: #e8e8e8;
+  --color-text: #1f1f1f;
+  --color-text-soft: #666666;
+  --color-shadow: rgba(0, 0, 0, 0.08);
+
+  --color-ingreso-bg: #e9f7ec;
+  --color-ingreso-accent: #3fa85b;
+  --color-ingreso-text: #215f34;
+
+  --color-egreso-bg: #fff5cc;
+  --color-egreso-accent: #d0a500;
+  --color-egreso-text: #7a6200;
+
+  --color-success: #2eaf52;
+  --color-danger: #d84343;
+  --color-export: #1d6f42;
+  --color-header-active: rgba(184, 150, 69, 0.22);
+}
+
+/* =========================================================
+   BASE DEL SITIO
+========================================================= */
+html,
+body {
+  min-height: 100%;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: 'Roboto', 'Segoe UI', Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+input,
+textarea,
+select,
+button {
+  font: inherit;
+}
+
+/* =========================================================
+   HEADER PRINCIPAL
+   Se estiliza para acercarse a la captura enviada.
+========================================================= */
+.topbar {
+  background:
+    linear-gradient(135deg, rgba(16, 16, 16, 0.98), rgba(31, 31, 31, 0.98));
+  color: #ffffff;
+  min-height: 68px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 18px;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.14);
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.topbar-shell {
+  width: 100%;
+  max-width: 1420px;
+  display: grid;
+  grid-template-columns: minmax(240px, auto) 1fr auto;
+  align-items: center;
+  gap: 18px;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  min-width: 0;
+}
+
+.brand:hover .brand-name {
+  text-decoration: none;
+}
+
+.brand-logo-frame {
+  width: 46px;
+  height: 46px;
+  border-radius: 13px;
+  background: rgba(255, 255, 255, 0.95);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08);
+  flex: 0 0 auto;
+}
+
+.brand-logo {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+}
+
+.brand-copy {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.brand-name {
+  font-size: 1.03rem;
+  line-height: 1.1;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+.brand-subtitle {
+  font-size: 0.72rem;
+  line-height: 1.2;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.68);
+  white-space: nowrap;
+}
+
+.top-nav {
+  justify-self: center;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.top-nav-link {
+  color: rgba(255, 255, 255, 0.88);
+  text-decoration: none;
+  font-size: 0.88rem;
+  font-weight: 500;
+  padding: 9px 13px;
+  border-radius: 999px;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 38px;
+}
+
+.top-nav-link:hover {
+  background: rgba(255, 255, 255, 0.10);
+  color: #ffffff;
+}
+
+.top-nav-link.active {
+  background: #ffffff;
+  color: #151515;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.16);
+}
+
+.top-nav-icon {
+  font-size: 18px;
+}
+
+.top-nav-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.top-nav-mini-caret {
+  font-size: 18px;
+  opacity: 0.9;
+  transition: transform 0.2s ease;
+}
+
+.has-caret {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* =========================================================
+   DROPDOWN DE MOVIMIENTOS EN HEADER
+========================================================= */
+.top-nav-dropdown {
+  position: relative;
+}
+
+.top-nav-dropdown-toggle {
+  min-width: 148px;
+  justify-content: space-between;
+}
+
+.top-nav-dropdown.open .top-nav-mini-caret {
+  transform: rotate(180deg);
+}
+
+.top-nav-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 12px);
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 220px;
+  background: #ffffff;
+  border: 1px solid #dfdfdf;
+  border-radius: 14px;
+  box-shadow: 0 18px 34px rgba(0, 0, 0, 0.20);
+  padding: 8px;
+  display: none;
+  flex-direction: column;
+  gap: 4px;
+  z-index: 60;
+}
+
+.top-nav-dropdown.open .top-nav-dropdown-menu {
+  display: flex;
+}
+
+.top-nav-dropdown-item {
+  width: 100%;
+  border: none;
+  background: transparent;
+  color: #222222;
+  border-radius: 10px;
+  padding: 10px 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.top-nav-dropdown-item:hover {
+  background: #f5f5f5;
+}
+
+.top-nav-dropdown-item.active,
+body.modo-ingreso #menuIngresos,
+body.modo-egreso #menuEgresos {
+  font-weight: 700;
+}
+
+body.modo-ingreso #menuIngresos {
+  background: var(--color-ingreso-bg);
+  color: var(--color-ingreso-text);
+}
+
+body.modo-egreso #menuEgresos {
+  background: var(--color-egreso-bg);
+  color: var(--color-egreso-text);
+}
+
+.topbar-actions {
+  justify-self: end;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.user-box {
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: #ffffff;
+  font-size: 0.86rem;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+}
+
+.user-box-icon {
+  font-size: 18px;
+  opacity: 0.88;
+}
+
+.logout-link {
+  min-height: 38px;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  border-radius: 999px;
+  padding: 8px 13px;
+  text-decoration: none;
+  font-size: 0.86rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.logout-link:hover {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+.logout-link .material-icons-outlined {
+  font-size: 18px;
+}
+
+/* =========================================================
+   CONTENIDO GENERAL
+========================================================= */
+.page-wrapper {
+  max-width: 1420px;
+  margin: 0 auto;
+  padding: 24px 22px 30px;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.page-header h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #232323;
+  margin-bottom: 4px;
+}
+
+.page-header p {
+  font-size: 0.95rem;
+  color: var(--color-text-soft);
+}
+
+.screenshot-style-header {
+  padding-top: 2px;
+}
+
+/* =========================================================
+   MODOS VISUALES
+========================================================= */
+body.modo-ingreso .mode-pill {
+  background: var(--color-ingreso-bg);
+  color: var(--color-ingreso-text);
+  border-color: rgba(63, 168, 91, 0.25);
+}
+
+body.modo-ingreso .mode-banner {
+  background: var(--color-ingreso-bg);
+  border-left-color: var(--color-ingreso-accent);
+}
+
+body.modo-ingreso .history-table thead th,
+body.modo-ingreso .report-table thead th {
+  background: #86dfe6;
+  color: #111111;
+}
+
+body.modo-egreso .mode-pill {
+  background: var(--color-egreso-bg);
+  color: var(--color-egreso-text);
+  border-color: rgba(208, 165, 0, 0.25);
+}
+
+body.modo-egreso .mode-banner {
+  background: var(--color-egreso-bg);
+  border-left-color: var(--color-egreso-accent);
+}
+
+body.modo-egreso .history-table thead th,
+body.modo-egreso .report-table thead th {
+  background: #f0dc84;
+  color: #111111;
+}
+
+/* =========================================================
+   BANNER DE MODO
+========================================================= */
+.mode-banner {
+  border-left: 6px solid transparent;
+  border-radius: 12px;
+  padding: 16px 18px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.mode-banner-icon {
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mode-banner-content strong {
+  display: block;
+  font-size: 1rem;
+  margin-bottom: 4px;
+}
+
+.mode-banner-content p {
+  color: #555555;
+}
+
+/* =========================================================
+   TARJETAS
+========================================================= */
+.card {
+  background: var(--color-card);
+  border: 1px solid var(--color-border-soft);
+  border-radius: 10px;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+.card-header {
+  padding: 18px 18px;
+  border-bottom: 1px solid #ededed;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.card-header h2 {
+  font-size: 1.02rem;
+  font-weight: 700;
+  color: #222222;
+}
+
+.mode-pill {
+  border: 1px solid transparent;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 6px 11px;
+  border-radius: 999px;
+}
+
+/* =========================================================
+   GRID PRINCIPAL
+========================================================= */
+.main-grid {
+  display: grid;
+  grid-template-columns: 1.02fr 0.98fr;
+  gap: 18px;
+  margin-bottom: 22px;
+}
+
+/* =========================================================
+   FORMULARIO
+========================================================= */
+.form-card {
+  padding-bottom: 16px;
+}
+
+.label-form {
+  padding: 16px;
+}
+
+.form-grid {
+  display: grid;
+  gap: 14px;
+}
+
+.form-grid.one-column {
+  grid-template-columns: 1fr;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group label {
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: #333333;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+  width: 100%;
+  border: 1px solid #d4d4d4;
+  border-radius: 8px;
+  background: #fafafa;
+  padding: 10px 12px;
+  outline: none;
+  font-size: 0.95rem;
+  color: #222222;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.form-group input[readonly] {
+  background: #f1f1f1;
+  color: #555555;
+  font-weight: 600;
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: #8b8b8b;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+  border-color: var(--color-gold-soft);
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(184, 150, 69, 0.1);
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 110px;
+}
+
+.form-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 18px;
+  flex-wrap: wrap;
+}
+
+/* =========================================================
+   BOTONES
+========================================================= */
+.btn {
+  border: none;
+  border-radius: 8px;
+  padding: 11px 16px;
+  font-size: 0.94rem;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    background 0.15s ease;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+}
+
+.btn-dark {
+  background: #111111;
+  color: #ffffff;
+}
+
+.btn-dark:hover {
+  background: #1a1a1a;
+}
+
+.btn-gold {
+  background: #c89a33;
+  color: #ffffff;
+}
+
+.btn-gold:hover {
+  background: #b9891e;
+}
+
+.btn-secondary {
+  background: #ececec;
+  color: #222222;
+}
+
+.btn-secondary:hover {
+  background: #e2e2e2;
+}
+
+/*
+  Botón de exportación del historial
+*/
+.btn-export {
+  background: var(--color-export);
+  color: #ffffff;
+  width: 100%;
+}
+
+.btn-export:hover {
+  background: #155c36;
+}
+
+/* =========================================================
+   VISTA PREVIA
+========================================================= */
+.preview-card {
+  padding-bottom: 16px;
+}
+
+.preview-canvas {
+  padding: 16px;
+  background:
+    linear-gradient(45deg, #f8f8f8 25%, transparent 25%),
+    linear-gradient(-45deg, #f8f8f8 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #f8f8f8 75%),
+    linear-gradient(-45deg, transparent 75%, #f8f8f8 75%);
+  background-size: 20px 20px;
+  background-position:
+    0 0,
+    0 10px,
+    10px -10px,
+    -10px 0px;
+}
+
+.label-sheet {
+  background: #ffffff;
+  border: 1px solid #dfdfdf;
+  border-radius: 14px;
+  min-height: 540px;
+  padding: 16px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+}
+
+.signature-area {
+  width: 100%;
+  margin-top: 30px;
+  padding-top: 22px;
+  text-align: center;
+}
+
+.signature-line {
+  width: 72%;
+  height: 1px;
+  background: #111827;
+  margin: 0 auto 8px;
+}
+
+.signature-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.signature-note {
+  margin-top: 3px;
+  font-size: 10px;
+  color: #6b7280;
+}
+
+.label-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  border-bottom: 1px solid #e7e7e7;
+  padding-bottom: 12px;
+  margin-bottom: 14px;
+}
+
+.label-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.label-brand img {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+}
+
+.label-brand h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #111111;
+  margin-bottom: 2px;
+}
+
+.label-brand p {
+  font-size: 0.9rem;
+  color: #666666;
+  font-weight: 400;
+}
+
+.label-code-box {
+  min-width: 160px;
+  background: #111111;
+  color: #ffffff;
+  border-radius: 12px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.label-mini-title {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.74);
+  margin-bottom: 4px;
+  font-weight: 400;
+}
+
+.label-code-box strong {
+  font-size: 0.98rem;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+}
+
+.label-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.label-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.label-field {
+  border: 1px solid #dddddd;
+  border-radius: 10px;
+  padding: 12px 12px;
+  background: #fafafa;
+  min-height: 66px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+}
+
+.label-field.full {
+  grid-column: 1 / -1;
+}
+
+.field-title {
+  font-size: 0.78rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #8b8b8b;
+}
+
+.label-field span:last-child {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #202020;
+  word-break: break-word;
+}
+
+.label-footer {
+  margin-top: 16px;
+  border-top: 1px solid #e8e8e8;
+  padding-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.barcode-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.barcode {
+  width: 100%;
+  max-width: 300px;
+  height: 58px;
+  border-radius: 4px;
+  background: repeating-linear-gradient(
+    90deg,
+    #111111 0px,
+    #111111 2px,
+    #ffffff 2px,
+    #ffffff 4px,
+    #111111 4px,
+    #111111 7px,
+    #ffffff 7px,
+    #ffffff 9px
+  );
+  border: 1px solid #d8d8d8;
+}
+
+.barcode-box span {
+  font-size: 0.9rem;
+  font-weight: 500;
+  letter-spacing: 0.4px;
+}
+
+.print-note {
+  text-align: center;
+  font-size: 0.82rem;
+  color: #777777;
+}
+
+/* =========================================================
+   HISTORIAL Y REPORTES
+========================================================= */
+.history-card,
+.reports-card {
+  padding-bottom: 16px;
+}
+
+.history-toolbar {
+  padding: 16px 18px 4px 18px;
+  border-bottom: 1px solid #ededed;
+}
+
+.history-filter-grid {
+  display: grid;
+  grid-template-columns: 100px 250px 1fr 150px;
+  gap: 12px;
+  align-items: end;
+}
+
+.filter-box {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.filter-box label {
+  font-size: 0.82rem;
+  color: #555555;
+  padding-left: 12px;
+}
+
+.filter-control {
+  width: 100%;
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid #d5d5d5;
+  border-radius: 6px;
+  background: #ffffff;
+  outline: none;
+  color: #222222;
+}
+
+.filter-control:focus {
+  border-color: var(--color-gold-soft);
+  box-shadow: 0 0 0 3px rgba(184, 150, 69, 0.1);
+}
+
+.search-inline {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-control {
+  padding-right: 42px;
+}
+
+.clear-search-btn {
+  position: absolute;
+  right: 8px;
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  color: #333333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.clear-search-btn:hover {
+  background: #f1f1f1;
+}
+
+.reports-header-row {
+  align-items: center;
+}
+
+.reports-header-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.reports-filters-strip {
+  padding: 16px 18px 10px 18px;
+  border-bottom: 1px solid #ededed;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(140px, 1fr));
+  gap: 12px;
+  align-items: end;
+}
+
+.reports-filters-strip .filter-wide {
+  grid-column: span 2;
+}
+
+.report-filter-button-box .btn {
+  width: 100%;
+}
+
+/* =========================================================
+   TABLAS DE HISTORIAL Y REPORTES
+   Propósito: centrar las tablas y hacer más claras sus celdas.
+========================================================= */
+.table-wrapper {
+  width: 100%;
+  padding: 16px 18px 4px 18px;
+  overflow-x: auto;
+  display: flex;
+  justify-content: center;
+}
+
+.history-table,
+.report-table {
+  width: 100%;
+  min-width: 980px;
+  margin: 0 auto;
+  border-collapse: separate;
+  border-spacing: 0;
+  table-layout: auto;
+  background: #ffffff;
+  border: 1px solid #d7dde4;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 10px 24px rgba(16, 24, 40, 0.06);
+}
+
+.history-table thead th,
+.report-table thead th {
+  text-align: center;
+  vertical-align: middle;
+  padding: 13px 12px;
+  font-size: 0.84rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  border-right: 1px solid rgba(17, 17, 17, 0.12);
+  border-bottom: 1px solid rgba(17, 17, 17, 0.16);
+  white-space: nowrap;
+}
+
+.history-table thead th:last-child,
+.report-table thead th:last-child,
+.history-table tbody td:last-child,
+.report-table tbody td:last-child {
+  border-right: none;
+}
+
+.history-table tbody td,
+.report-table tbody td {
+  padding: 13px 12px;
+  border-right: 1px solid #e1e6ec;
+  border-bottom: 1px solid #e1e6ec;
+  font-size: 0.9rem;
+  color: #263238;
+  background: #ffffff;
+  text-align: center;
+  vertical-align: middle;
+  line-height: 1.35;
+}
+
+.history-table tbody tr:last-child td,
+.report-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.history-table tbody tr:nth-child(even) td,
+.report-table tbody tr:nth-child(even) td {
+  background: #f8fafc;
+}
+
+.history-table tbody tr:hover td,
+.report-table tbody tr:hover td {
+  background: #fff9e8;
+}
+
+/* Propósito: dar mejor lectura a columnas con texto largo. */
+.report-table tbody td:nth-child(4),
+.report-table tbody td:nth-child(5),
+.history-table tbody td:nth-child(4),
+.history-table tbody td:nth-child(5) {
+  text-align: left;
+  max-width: 320px;
+  white-space: normal;
+  word-break: break-word;
+}
+
+/* Propósito: alinear importes de forma uniforme y fácil de comparar. */
+.report-table tbody td:nth-child(6),
+.history-table tbody td:nth-child(6) {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+
+/* Propósito: centrar los mensajes de carga, error o tabla vacía. */
+.report-table tbody td[colspan],
+.history-table tbody td[colspan] {
+  text-align: center;
+  color: #667085;
+  font-weight: 600;
+}
+
+.tipo-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 90px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.tipo-badge.ingreso {
+  background: var(--color-ingreso-bg);
+  color: var(--color-ingreso-text);
+}
+
+.tipo-badge.egreso {
+  background: var(--color-egreso-bg);
+  color: var(--color-egreso-text);
+}
+
+/* =========================================================
+   TOAST
+========================================================= */
+.toast-message {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: 360px;
+  max-width: calc(100vw - 32px);
+  min-height: 84px;
+  background: #ffffff;
+  border-radius: 14px;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.16);
+  border: 1px solid #e8e8e8;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px 44px 16px 16px;
+  z-index: 6000;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(-16px) scale(0.96);
+  pointer-events: none;
+  transition:
+    opacity 0.28s ease,
+    transform 0.28s ease;
+}
+
+.toast-message.show {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+.toast-message.success {
+  border-left: 6px solid #2eaf52;
+}
+
+.toast-message.error {
+  border-left: 6px solid #d84343;
+}
+
+.toast-icon {
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1px;
+}
+
+.toast-message.success .toast-icon {
+  background: rgba(46, 175, 82, 0.12);
+  color: #2eaf52;
+}
+
+.toast-message.error .toast-icon {
+  background: rgba(216, 67, 67, 0.12);
+  color: #d84343;
+}
+
+.toast-icon .material-icons-outlined {
+  font-size: 24px;
+}
+
+.toast-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.toast-title {
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: #1f1f1f;
+  line-height: 1.2;
+}
+
+.toast-text {
+  font-size: 0.9rem;
+  color: #5f5f5f;
+  line-height: 1.35;
+}
+
+.toast-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  color: #777777;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.toast-close:hover {
+  background: #f3f3f3;
+  color: #333333;
+}
+
+.toast-close .material-icons-outlined {
+  font-size: 18px;
+}
+
+.toast-progress {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 4px;
+  width: 100%;
+  transform-origin: left center;
+}
+
+.toast-message.success .toast-progress {
+  background: linear-gradient(90deg, #2eaf52, #59c878);
+}
+
+.toast-message.error .toast-progress {
+  background: linear-gradient(90deg, #d84343, #ef6b6b);
+}
+
+.toast-progress.animate {
+  animation: toastProgressBar 2.6s linear forwards;
+}
+
+@keyframes toastProgressBar {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
+
+/* =========================================================
+   RESALTADO DE FILA NUEVA
+========================================================= */
+.row-highlight td {
+  animation: rowFlash 1.4s ease;
+}
+
+@keyframes rowFlash {
+  0% {
+    background-color: #fff6d6;
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+@media (max-width: 1280px) {
+  .reports-filters-strip {
+    grid-template-columns: repeat(3, minmax(160px, 1fr));
+  }
+
+  .reports-filters-strip .filter-wide {
+    grid-column: span 1;
+  }
+}
+
+@media (max-width: 1200px) {
+  .main-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .history-filter-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 900px) {
+  .topbar {
+    padding: 10px 12px;
+  }
+
+  .topbar-shell {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .brand,
+  .top-nav,
+  .topbar-actions {
+    justify-self: center;
+  }
+
+  .topbar-actions {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .history-filter-grid,
+  .reports-filters-strip {
+    grid-template-columns: 1fr;
+  }
+
+  .reports-header-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+}
+
+@media (max-width: 768px) {
+  .page-wrapper {
+    padding: 16px;
+  }
+
+  .label-row {
+    grid-template-columns: 1fr;
+  }
+
+  .top-nav {
+    flex-wrap: wrap;
+    border-radius: 18px;
+  }
+
+  .top-nav-dropdown-menu {
+    position: static;
+    transform: none;
+    margin-top: 8px;
+    width: 100%;
+  }
+
+  .toast-message {
+    right: 12px;
+    left: 12px;
+    width: auto;
+    max-width: none;
+  }
+}
+/* =========================================================
+   LOGIN ADAPTADO A REACT
+   Estos estilos vienen del login.html original y se separaron
+   para que correspondan al archivo CSS del proyecto React.
+========================================================= */
+.login-page {
+  background:
+    radial-gradient(circle at top left, rgba(184, 150, 69, 0.14), transparent 28%),
+    linear-gradient(135deg, #f5f5f5 0%, #ececec 100%);
+}
+
+.login-wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 430px;
+  background: #ffffff;
+  border: 1px solid #e8e8e8;
+  border-radius: 18px;
+  box-shadow: 0 22px 44px rgba(0, 0, 0, 0.1);
+  padding: 28px 24px;
+}
+
+.login-brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 22px;
+}
+
+.login-logo {
+  width: 58px;
+  height: 58px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.login-brand h1 {
+  font-size: 1.55rem;
+  font-weight: 700;
+  color: #1f1f1f;
+  margin-bottom: 2px;
+}
+
+.login-brand p {
+  color: #666666;
+  font-size: 0.95rem;
+}
+
+.login-alert {
+  background: #fff1f1;
+  color: #b82323;
+  border: 1px solid #f0c2c2;
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 16px;
+  font-size: 0.92rem;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.login-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.login-field label {
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: #333333;
+}
+
+.input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-wrap .material-icons-outlined {
+  position: absolute;
+  left: 12px;
+  color: #7a7a7a;
+  font-size: 20px;
+  pointer-events: none;
+}
+
+.login-field input {
+  width: 100%;
+  border: 1px solid #d4d4d4;
+  border-radius: 10px;
+  background: #fafafa;
+  padding: 12px 14px 12px 42px;
+  outline: none;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+  color: #222222;
+}
+
+.login-field input:focus {
+  border-color: #c4a357;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(184, 150, 69, 0.1);
+}
+
+.login-field input::placeholder {
+  color: #8b8b8b;
+}
+
+.btn-login {
+  margin-top: 4px;
+  border: none;
+  border-radius: 10px;
+  background: #101010;
+  color: #ffffff;
+  padding: 12px 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition:
+    background 0.2s ease,
+    transform 0.15s ease;
+}
+
+.btn-login:hover {
+  background: #1a1a1a;
+  transform: translateY(-1px);
+}
+
+.login-demo {
+  margin-top: 16px;
+  font-size: 0.88rem;
+  color: #666666;
+}
+
+.login-footer {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid #ececec;
+  font-size: 0.84rem;
+  color: #7a7a7a;
+  text-align: center;
+}
+
+@media (max-width: 480px) {
+  .login-card {
+    padding: 24px 18px;
+    border-radius: 14px;
+  }
+
+  .login-brand {
+    align-items: flex-start;
+  }
+
+  .login-brand h1 {
+    font-size: 1.35rem;
+  }
+}
+
+/* Espacio para firma física dentro del ticket */
+.signature-area {
+  width: 100%;
+  margin-top: 30px;
+  padding-top: 22px;
+  text-align: center;
+}
+
+/* Línea donde firmará el responsable */
+.signature-line {
+  width: 72%;
+  height: 1px;
+  background: #111827;
+  margin: 0 auto 8px;
+}
+
+/* Texto principal de firma */
+.signature-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #111827;
+}
+
+/* Texto secundario de firma */
+.signature-note {
+  margin-top: 3px;
+  font-size: 10px;
+  color: #6b7280;
+}
+
+/* =========================================================
+   INICIO - TABLA TIPO EXCEL SEMANAL
+========================================================= */
+
+.home-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(220px, 1fr));
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.home-summary-card {
+  background: #ffffff;
+  border: 1px solid #e4e7ec;
+  border-radius: 14px;
+  padding: 16px 18px;
+  box-shadow: 0 8px 22px rgba(16, 24, 40, 0.06);
+}
+
+.home-summary-card span {
+  display: block;
+  font-size: 0.78rem;
+  color: #667085;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  font-weight: 800;
+}
+
+.home-summary-card.income {
+  border-color: #b7ebc4;
+}
+
+.home-summary-card.expense {
+  border-color: #ffd2d6;
+}
+
+.home-summary-card.final {
+  border-color: #b89645;
+  background: #fffaf0;
+}
+
+.home-currency-summary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.home-currency-summary div {
+  min-width: 0;
+  padding: 10px 12px;
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+}
+
+.home-summary-card.income .home-currency-summary div {
+  background: #ecfdf3;
+  border-color: #c7f0d2;
+}
+
+.home-summary-card.expense .home-currency-summary div {
+  background: #fff1f3;
+  border-color: #ffd5da;
+}
+
+.home-summary-card.final .home-currency-summary div {
+  background: #ffffff;
+  border-color: #ead7a8;
+}
+
+.home-currency-summary small {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 0.74rem;
+  font-weight: 800;
+  color: #667085;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.home-currency-summary strong {
+  display: block;
+  overflow-wrap: anywhere;
+  font-size: 1.14rem;
+  font-weight: 900;
+  color: #111827;
+  font-variant-numeric: tabular-nums;
+}
+
+.home-summary-card.income .home-currency-summary strong {
+  color: #027a48;
+}
+
+.home-summary-card.expense .home-currency-summary strong {
+  color: #b42318;
+}
+
+.home-summary-card.final .home-currency-summary strong {
+  color: #111827;
+}
+
+.home-excel-card {
+  overflow: hidden;
+  border: 1px solid #e4e7ec;
+  box-shadow: 0 12px 30px rgba(16, 24, 40, 0.07);
+}
+
+.home-control-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 22px 24px;
+  border-bottom: 1px solid #edf0f3;
+  background: linear-gradient(135deg, #ffffff 0%, #fbfcfe 100%);
+}
+
+.home-control-title-block {
+  max-width: 760px;
+}
+
+.home-section-kicker {
+  display: inline-flex;
+  margin-bottom: 8px;
+  color: #667085;
+  font-size: 0.74rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.home-control-title-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 6px;
+}
+
+.home-control-title-row h2 {
+  margin: 0;
+  color: #101828;
+  font-size: 1.32rem;
+  line-height: 1.2;
+}
+
+.home-control-title-block p {
+  margin: 0;
+  color: #475467;
+  font-size: 0.94rem;
+  line-height: 1.45;
+}
+
+.home-status-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+}
+
+.home-status-chip.automatic {
+  color: #026aa2;
+  background: #eff8ff;
+  border: 1px solid #b9e6fe;
+}
+
+.home-status-chip.manual {
+  color: #7a6200;
+  background: #fffaeb;
+  border: 1px solid #fedf89;
+}
+
+.home-control-meta-card {
+  min-width: 230px;
+  padding: 14px 16px;
+  border: 1px solid #ead7a8;
+  border-radius: 14px;
+  background: #fffaf0;
+  text-align: right;
+}
+
+.home-control-meta-card span {
+  display: block;
+  margin-bottom: 6px;
+  color: #7a6200;
+  font-size: 0.73rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.home-control-meta-card strong {
+  display: block;
+  color: #101828;
+  font-size: 0.95rem;
+  line-height: 1.25;
+}
+
+.home-control-meta-card small {
+  display: block;
+  margin-top: 4px;
+  color: #667085;
+  font-size: 0.8rem;
+}
+
+.home-card-subtitle {
+  margin: 4px 0 0;
+  color: #667085;
+  font-size: 0.9rem;
+}
+
+.home-auto-balance-note {
+  margin-top: 6px;
+  color: #475467;
+  font-size: 0.86rem;
+}
+
+.home-filters-panel {
+  margin: 18px 20px 0;
+  padding: 16px;
+  border: 1px solid #e4e7ec;
+  border-radius: 16px;
+  background: #f8fafc;
+}
+
+.home-filters-panel-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.home-filters-panel-heading h3 {
+  margin: 0 0 4px;
+  color: #101828;
+  font-size: 0.98rem;
+  line-height: 1.25;
+}
+
+.home-filters-panel-heading p {
+  margin: 0;
+  color: #667085;
+  font-size: 0.86rem;
+  line-height: 1.35;
+}
+
+.home-filters-row {
+  display: grid;
+  grid-template-columns: minmax(150px, 0.75fr) minmax(240px, 1.2fr) minmax(190px, 1fr) minmax(190px, 1fr);
+  gap: 12px;
+  margin-bottom: 0;
+}
+
+.home-filter-card {
+  position: relative;
+  min-width: 0;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid #e4e7ec;
+  border-radius: 14px;
+  background: #ffffff;
+}
+
+.home-filter-card label {
+  padding-left: 0;
+  color: #344054;
+  font-size: 0.76rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.home-filter-card .filter-control {
+  height: 42px;
+  border-radius: 10px;
+  border-color: #d0d5dd;
+  color: #101828;
+  font-size: 0.92rem;
+  background: #ffffff;
+}
+
+.home-filter-card .filter-control:disabled {
+  color: #475467;
+  background: #f2f4f7;
+  border-color: #e4e7ec;
+  cursor: not-allowed;
+}
+
+.home-money-card small {
+  position: absolute;
+  right: 24px;
+  bottom: 23px;
+  color: #98a2b3;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  pointer-events: none;
+}
+
+.home-money-card .filter-control {
+  padding-right: 56px;
+  font-variant-numeric: tabular-nums;
+}
+
+.home-balance-auto-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 32px;
+  padding: 7px 11px;
+  border: 1px solid #b9e6fe;
+  border-radius: 999px;
+  color: #026aa2;
+  background: #eff8ff;
+  font-size: 0.78rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.home-balance-auto-chip span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: #d1e9ff;
+  font-size: 0.86rem;
+  line-height: 1;
+}
+
+.home-table-wrapper {
+  padding-top: 20px;
+}
+
+/* =========================================================
+   TABLA TIPO EXCEL DEL INICIO
+   Propósito: separar ingresos, egresos y saldos por pesos y dólares.
+========================================================= */
+.home-excel-table {
+  width: 100%;
+  min-width: 1180px;
+  margin: 0 auto;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: #ffffff;
+  font-size: 0.9rem;
+  border: 1px solid #d7dde4;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 10px 24px rgba(16, 24, 40, 0.05);
+}
+
+.home-excel-table th,
+.home-excel-table td {
+  border-right: 1px solid #d7dde4;
+  border-bottom: 1px solid #d7dde4;
+  padding: 11px 12px;
+  vertical-align: middle;
+  text-align: center;
+}
+
+.home-excel-table th:last-child,
+.home-excel-table td:last-child {
+  border-right: none;
+}
+
+.home-excel-table tbody tr:last-child td,
+.home-excel-table tfoot tr:last-child td {
+  border-bottom: none;
+}
+
+.home-excel-table thead th {
+  background: #d9eef3;
+  color: #111827;
+  font-weight: 900;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.home-excel-table thead .home-currency-head th {
+  font-size: 0.78rem;
+  background: #eef8fb;
+  color: #475467;
+}
+
+.home-excel-table .home-th-income {
+  background: #dff7e7;
+  color: #027a48;
+}
+
+.home-excel-table .home-th-expense {
+  background: #ffe4e8;
+  color: #b42318;
+}
+
+.home-excel-table .home-th-balance {
+  background: #fff3d4;
+  color: #7a6200;
+}
+
+.home-excel-table tbody td:nth-child(4),
+.home-excel-table tbody td:nth-child(5),
+.home-excel-table tbody td:nth-child(6),
+.home-excel-table tbody td:nth-child(7),
+.home-excel-table tbody td:nth-child(8),
+.home-excel-table tbody td:nth-child(9),
+.home-excel-table tfoot td:nth-child(4),
+.home-excel-table tfoot td:nth-child(5),
+.home-excel-table tfoot td:nth-child(6),
+.home-excel-table tfoot td:nth-child(7),
+.home-excel-table tfoot td:nth-child(8),
+.home-excel-table tfoot td:nth-child(9) {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.home-excel-table tbody td:nth-child(3) {
+  min-width: 340px;
+  text-align: left;
+}
+
+.home-row-initial td {
+  background: #f8fafc;
+  font-weight: 800;
+}
+
+.home-row-ingreso td:nth-child(4),
+.home-row-ingreso td:nth-child(5) {
+  background: #ecfdf3;
+  color: #027a48;
+  font-weight: 800;
+}
+
+.home-row-egreso td:nth-child(6),
+.home-row-egreso td:nth-child(7) {
+  background: #fff1f3;
+  color: #b42318;
+  font-weight: 800;
+}
+
+.home-excel-table tbody td:nth-child(8),
+.home-excel-table tbody td:nth-child(9) {
+  background: #fffaf0;
+  font-weight: 800;
+}
+
+.home-excel-table tfoot td {
+  background: #f3f4f6;
+  font-weight: 900;
+}
+
+.home-excel-table tfoot td:nth-child(4),
+.home-excel-table tfoot td:nth-child(5) {
+  color: #027a48;
+}
+
+.home-excel-table tfoot td:nth-child(6),
+.home-excel-table tfoot td:nth-child(7) {
+  color: #b42318;
+}
+
+.home-excel-table tfoot td:nth-child(8),
+.home-excel-table tfoot td:nth-child(9) {
+  color: #111827;
+}
+
+.home-empty-row {
+  text-align: center !important;
+  padding: 18px !important;
+  color: #667085;
+}
+
+@media (max-width: 1180px) {
+  .home-summary-grid {
+    grid-template-columns: repeat(2, minmax(220px, 1fr));
+  }
+
+  .home-control-header {
+    flex-direction: column;
+  }
+
+  .home-control-meta-card {
+    text-align: left;
+  }
+
+  .home-filters-row {
+    grid-template-columns: repeat(2, minmax(220px, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .home-summary-grid,
+  .home-filters-row {
+    grid-template-columns: 1fr;
+  }
+
+  .home-control-header {
+    padding: 18px;
+  }
+
+  .home-filters-panel {
+    margin: 14px 14px 0;
+    padding: 14px;
+  }
+
+  .home-filters-panel-heading {
+    flex-direction: column;
+  }
+}
+/* =========================================================
+   ACCIONES DE REPORTES
+========================================================= */
+/* Propósito: centrar los botones de editar/eliminar dentro de la celda. */
+.report-row-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 190px;
+}
+
+.btn-icon-action {
+  border: none;
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  cursor: pointer;
+  transition:
+    transform 0.15s ease,
+    background 0.15s ease,
+    opacity 0.15s ease;
+}
+
+.btn-icon-action:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.btn-icon-action:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.btn-icon-action .material-icons-outlined {
+  font-size: 18px;
+}
+
+.btn-edit-row {
+  background: #eef4ff;
+  color: #174ea6;
+}
+
+.btn-edit-row:hover:not(:disabled) {
+  background: #dce9ff;
+}
+
+.btn-delete-row {
+  background: #fff0f0;
+  color: #b42318;
+}
+
+.btn-delete-row:hover:not(:disabled) {
+  background: #ffe0e0;
+}
+
+/* =========================================================
+   MODAL DE EDICIÓN DE REPORTES
+========================================================= */
+.report-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.42);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  z-index: 5000;
+}
+
+.report-modal-card {
+  width: min(820px, 100%);
+  max-height: calc(100vh - 36px);
+  overflow-y: auto;
+  background: #ffffff;
+  border-radius: 18px;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  padding: 20px;
+}
+
+.report-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #ededed;
+  margin-bottom: 16px;
+}
+
+.report-modal-header h2 {
+  font-size: 1.25rem;
+  color: #111111;
+  margin-bottom: 4px;
+}
+
+.report-modal-header p {
+  color: #666666;
+  font-size: 0.92rem;
+}
+
+.report-modal-close {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  border: none;
+  border-radius: 10px;
+  background: #f3f3f3;
+  color: #333333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.report-modal-close:hover:not(:disabled) {
+  background: #e8e8e8;
+}
+
+.report-modal-close:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.report-modal-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(220px, 1fr));
+  gap: 14px;
+}
+
+.report-modal-wide {
+  grid-column: 1 / -1;
+}
+
+.report-modal-textarea {
+  height: auto;
+  min-height: 96px;
+  padding-top: 10px;
+  resize: vertical;
+}
+
+.report-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid #ededed;
+}
+
+@media (max-width: 768px) {
+  .report-modal-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .report-modal-actions {
+    flex-direction: column-reverse;
+  }
+
+  .report-modal-actions .btn {
+    width: 100%;
+  }
+
+  .report-row-actions {
+    flex-direction: column;
+    align-items: stretch;
+    min-width: 130px;
+  }
+}
+
+/* =========================================================
+   SECCIONES DE REPORTES: INGRESOS / EGRESOS
+========================================================= */
+.report-section-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(220px, 1fr));
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.report-section-tab {
+  border: 1px solid #e2e2e2;
+  background: #ffffff;
+  border-radius: 16px;
+  min-height: 78px;
+  padding: 16px 18px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  cursor: pointer;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.04);
+  transition:
+    transform 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    background 0.15s ease;
+}
+
+.report-section-tab:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.08);
+}
+
+.report-section-tab .material-icons-outlined {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  background: #f4f4f4;
+  color: #3a3a3a;
+}
+
+.report-section-tab-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: left;
+}
+
+.report-section-tab-text strong {
+  font-size: 1rem;
+  color: #1f1f1f;
+}
+
+.report-section-tab-text small {
+  font-size: 0.82rem;
+  color: #777777;
+}
+
+.report-section-tab.active {
+  border-color: var(--color-gold-soft);
+  box-shadow: 0 16px 36px rgba(184, 150, 69, 0.16);
+}
+
+body.modo-ingreso .report-section-tab.active {
+  background: linear-gradient(135deg, #ffffff 0%, #ecfcfd 100%);
+}
+
+body.modo-egreso .report-section-tab.active {
+  background: linear-gradient(135deg, #ffffff 0%, #fff8df 100%);
+}
+
+body.modo-ingreso .report-section-tab.active .material-icons-outlined {
+  background: var(--color-ingreso-bg);
+  color: var(--color-ingreso-text);
+}
+
+body.modo-egreso .report-section-tab.active .material-icons-outlined {
+  background: var(--color-egreso-bg);
+  color: var(--color-egreso-text);
+}
+
+.report-section-description {
+  color: #666666;
+  font-size: 0.9rem;
+  margin-top: 4px;
+}
+
+.reports-filters-separated {
+  grid-template-columns: repeat(4, minmax(140px, 1fr));
+}
+
+@media (max-width: 768px) {
+  .report-section-tabs {
+    grid-template-columns: 1fr;
+  }
+
+  .report-section-tab {
+    min-height: 70px;
+  }
+}
+
+/* =========================================================
+   AJUSTE FINAL DE TABLAS Y SELECTOR DE MONEDA
+   Propósito: mantener títulos, registros e importes centrados.
+========================================================= */
+.history-table th,
+.history-table td,
+.report-table th,
+.report-table td,
+.home-excel-table th,
+.home-excel-table td {
+  text-align: center !important;
+  vertical-align: middle !important;
+}
+
+.history-table tbody td,
+.report-table tbody td,
+.home-excel-table tbody td,
+.home-excel-table tfoot td {
+  text-align: center !important;
+}
+
+.history-table tbody td:nth-child(4),
+.history-table tbody td:nth-child(5),
+.report-table tbody td:nth-child(4),
+.report-table tbody td:nth-child(5),
+.home-excel-table tbody td:nth-child(3) {
+  text-align: center !important;
+  white-space: normal;
+  word-break: break-word;
+}
+
+.money-cell,
+.currency-cell,
+.history-table tbody td:nth-child(6),
+.report-table tbody td:nth-child(6),
+.home-excel-table tbody td:nth-child(4),
+.home-excel-table tbody td:nth-child(5),
+.home-excel-table tbody td:nth-child(6),
+.home-excel-table tbody td:nth-child(7),
+.home-excel-table tbody td:nth-child(8),
+.home-excel-table tbody td:nth-child(9),
+.home-excel-table tfoot td:nth-child(4),
+.home-excel-table tfoot td:nth-child(5),
+.home-excel-table tfoot td:nth-child(6),
+.home-excel-table tfoot td:nth-child(7),
+.home-excel-table tfoot td:nth-child(8),
+.home-excel-table tfoot td:nth-child(9) {
+  text-align: center !important;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.currency-choice-group {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.currency-choice {
+  min-height: 58px;
+  border: 1px solid #d5d9e0;
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  color: #202020;
+  cursor: pointer;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, transform 0.15s ease;
+  text-align: left;
+}
+
+.currency-choice:hover {
+  border-color: var(--color-gold);
+  background: #fffaf0;
+  transform: translateY(-1px);
+}
+
+.currency-choice.selected {
+  border-color: var(--color-gold);
+  background: #fff7df;
+  box-shadow: 0 0 0 3px rgba(184, 150, 69, 0.18);
+}
+
+.currency-choice-symbol {
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
+  border-radius: 50%;
+  background: #f3f4f6;
+  color: #111827;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 0.82rem;
+}
+
+.currency-choice.selected .currency-choice-symbol {
+  background: var(--color-black);
+  color: #ffffff;
+}
+
+.currency-choice-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  line-height: 1.1;
+  min-width: 0;
+}
+
+.currency-choice-text strong {
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.currency-choice-text small {
+  font-size: 0.73rem;
+  color: #667085;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.currency-choice-check {
+  margin-left: auto;
+  font-size: 20px;
+  color: var(--color-gold);
+  opacity: 0;
+  transition: opacity 0.18s ease;
+}
+
+.currency-choice.selected .currency-choice-check {
+  opacity: 1;
+}
+
+@media (max-width: 520px) {
+  .currency-choice-group {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ============================================================
+   Ajustes para reportes cancelados y prueba de montos editados
+   ============================================================ */
+
+/* Propósito: pintar de rojo toda la fila cuando el movimiento está cancelado. */
+.report-table tbody tr.report-row-cancelado td {
+  background-color: #ffe1e1 !important;
+  color: #8a1f1f !important;
+  border-color: #f3b6b6 !important;
+}
+
+/* Propósito: mantener la fila cancelada en rojo al pasar el mouse. */
+.report-table tbody tr.report-row-cancelado:hover td {
+  background-color: #ffd1d1 !important;
+}
+
+/* Propósito: separar visualmente la tabla temporal de montos editados. */
+.edited-preview-card {
+  margin-top: 22px;
+}
+
+/* Propósito: etiqueta para indicar que la tabla todavía es de prueba. */
+.edited-preview-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: #fff7ed;
+  color: #9a3412;
+  border: 1px solid #fed7aa;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+/* Propósito: resaltar filas de prueba que tienen ajuste registrado. */
+.report-table tbody tr.report-row-edited td {
+  background-color: #fffaf0;
+}
+
+/* Propósito: mantener legible la fila de prueba editada al pasar el mouse. */
+.report-table tbody tr.report-row-edited:hover td {
+  background-color: #fff3d6;
+}
+
+/* Propósito: acomodar la etiqueta y botón del ajuste dentro de la celda. */
+.adjustment-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+}
+
+/* Propósito: mostrar que una fila tuvo una edición o ajuste. */
+.adjustment-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 9px;
+  border-radius: 999px;
+  background-color: #facc15;
+  color: #713f12;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+/* Propósito: botón para abrir el detalle del ajuste. */
+.btn-adjustment-detail {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: #1f2937;
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* Propósito: mejorar el estado hover del botón de detalle. */
+.btn-adjustment-detail:hover {
+  background: #f8fafc;
+  border-color: #94a3b8;
+}
+
+/* Propósito: ajustar el tamaño del ícono dentro del botón. */
+.btn-adjustment-detail .material-icons-outlined {
+  font-size: 16px;
+}
+
+/* Propósito: texto para filas sin ajustes. */
+.no-adjustment-text {
+  color: #64748b;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+/* Propósito: tamaño especial del modal de detalle de ajuste. */
+.adjustment-modal-card {
+  max-width: 620px;
+}
+
+/* Propósito: organizar los datos del ajuste en tarjetas pequeñas. */
+.adjustment-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 18px;
+}
+
+/* Propósito: caja visual para cada dato del ajuste. */
+.adjustment-detail-box {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px;
+  border-radius: 16px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+}
+
+/* Propósito: etiqueta secundaria dentro del detalle. */
+.adjustment-detail-box span {
+  color: #64748b;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Propósito: valor principal dentro del detalle. */
+.adjustment-detail-box strong {
+  color: #111827;
+  font-size: 1rem;
+}
+
+/* Propósito: resaltar la diferencia del ajuste. */
+.adjustment-detail-difference {
+  grid-column: 1 / -1;
+  background: #fff7ed;
+  border-color: #fed7aa;
+}
+
+/* Propósito: acomodar el botón de cierre del modal. */
+.adjustment-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+/* Propósito: adaptar el modal a pantallas pequeñas. */
+@media (max-width: 640px) {
+  .adjustment-detail-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ============================================================
+   Ajustes reales de movimientos editados
+   ============================================================ */
+
+/* Propósito: dejar limpia la celda cuando un cancelado no tiene ajuste. */
+.empty-adjustment-cell {
+  display: inline-block;
+  min-height: 1px;
+  color: #9ca3af;
+  font-weight: 700;
+}
+
+/* Propósito: centrar el botón de ver ajuste en la tabla de cancelados. */
+.report-table td .btn-adjustment-detail {
+  margin: 0 auto;
+}
+
+/* Propósito: pintar de rojo los movimientos cancelados incluso si también tienen ajuste. */
+.report-table tbody tr.report-row-cancelado td,
+.history-table tbody tr.report-row-cancelado td {
+  background-color: #ffe1e1 !important;
+  color: #8a1f1f !important;
+  border-color: #f3b6b6 !important;
+}
+
+/* Propósito: mantener la fila cancelada en rojo al pasar el mouse. */
+.report-table tbody tr.report-row-cancelado:hover td,
+.history-table tbody tr.report-row-cancelado:hover td {
+  background-color: #ffd1d1 !important;
+}
+
+/* ============================================================
+   Historial completo de ajustes en Reportes > Cancelados
+   ============================================================ */
+
+/* Propósito: separar el historial completo de la tabla principal. */
+.edit-history-card {
+  margin-top: 22px;
+}
+
+
+/* Propósito: permitir que la tabla de historial respire en pantallas grandes. */
+.edit-history-table th,
+.edit-history-table td {
+  white-space: nowrap;
+}
+
+/* Propósito: permitir que nombre, concepto y comentario no rompan la lectura del historial. */
+.edit-history-table td:nth-child(4),
+.edit-history-table td:nth-child(5),
+.edit-history-table td:nth-child(6),
+.edit-history-comment-cell {
+  white-space: normal;
+  min-width: 150px;
+}
+
+/* ============================================================
+   Botón Ver ajuste dentro de Acciones y campos modificados
+   ============================================================ */
+/* Propósito: diferenciar el botón Ver ajuste cuando vive junto a Editar y Cancelar. */
+.btn-adjustment-row {
+  background: #ecfdf5;
+  color: #047857;
+}
+
+/* Propósito: mejorar el estado hover del botón Ver ajuste. */
+.btn-adjustment-row:hover:not(:disabled) {
+  background: #d1fae5;
+}
+
+/* Propósito: resaltar en verde el campo que cambió en el último ajuste. */
+.adjustment-detail-changed {
+  background: #ecfdf5;
+  border-color: #86efac;
+}
+
+/* Propósito: hacer visible el título de un campo modificado. */
+.adjustment-detail-changed span {
+  color: #047857;
+}
+
+/* Propósito: mostrar el valor anterior dentro de un campo modificado. */
+.adjustment-field-before {
+  display: block;
+  color: #047857;
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+/* Propósito: dar más espacio al modal porque ahora muestra más campos. */
+.adjustment-modal-card {
+  max-width: 780px;
+}
+
+
+/* Propósito: mantener el nombre/logo como botón sin subrayado visual. */
+.brand,
+.brand:hover,
+.brand:focus,
+.brand:visited,
+.brand-name,
+.brand:hover .brand-name,
+.brand:focus .brand-name {
+  text-decoration: none !important;
+}
+
+/* Propósito: mostrar el comentario del ajuste en una tarjeta de ancho completo. */
+.adjustment-detail-comment {
+  grid-column: 1 / -1;
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+}
+
+/* Propósito: permitir que comentarios largos se lean sin romper el modal. */
+.adjustment-detail-comment strong {
+  white-space: pre-wrap;
+  word-break: break-word;
+  line-height: 1.45;
+}
+
+/* =========================================================
+   AJUSTES SNOOPY PROJECT 2 - COLORES POR MONEDA E IMPRESIÓN
+========================================================= */
+
+/* Propósito: mantener Ingreso/Egreso en gris dentro del encabezado de Inicio. */
+.home-excel-table .home-th-income,
+.home-excel-table .home-th-expense {
+  background: #f3f4f6 !important;
+  color: #4b5563 !important;
+  border-color: #d1d5db !important;
+}
+
+/* Propósito: colorear Dólares en azul rey y Pesos en verde en las tarjetas de Inicio. */
+.home-currency-summary div:first-child {
+  background: #eff6ff !important;
+  border-color: #1d4ed8 !important;
+}
+
+.home-currency-summary div:first-child small,
+.home-currency-summary div:first-child strong {
+  color: #1d4ed8 !important;
+}
+
+.home-currency-summary div:nth-child(2) {
+  background: #ecfdf5 !important;
+  border-color: #16a34a !important;
+}
+
+.home-currency-summary div:nth-child(2) small,
+.home-currency-summary div:nth-child(2) strong {
+  color: #16a34a !important;
+}
+
+/* Propósito: evitar colores rojo/verde por tipo en las tarjetas de ingreso y egreso. */
+.home-summary-card.income,
+.home-summary-card.expense {
+  border-color: #d1d5db !important;
+}
+
+.home-summary-card.income > span,
+.home-summary-card.expense > span {
+  color: #6b7280 !important;
+}
+
+/* Propósito: marcar columnas de Dólares en azul rey y Pesos en verde en Inicio. */
+.home-excel-table thead .home-currency-head th:nth-child(odd),
+.home-excel-table tbody td:nth-child(4),
+.home-excel-table tbody td:nth-child(6),
+.home-excel-table tbody td:nth-child(8),
+.home-excel-table tfoot td:nth-child(4),
+.home-excel-table tfoot td:nth-child(6),
+.home-excel-table tfoot td:nth-child(8) {
+  color: #1d4ed8 !important;
+}
+
+.home-excel-table thead .home-currency-head th:nth-child(even),
+.home-excel-table tbody td:nth-child(5),
+.home-excel-table tbody td:nth-child(7),
+.home-excel-table tbody td:nth-child(9),
+.home-excel-table tfoot td:nth-child(5),
+.home-excel-table tfoot td:nth-child(7),
+.home-excel-table tfoot td:nth-child(9) {
+  color: #16a34a !important;
+}
+
+/* Propósito: colocar Pesos, Dólares y Guardar en una sola fila en Movimientos. */
+.currency-action-group {
+  grid-column: 1 / -1;
+}
+
+.currency-save-row {
+  display: grid;
+  grid-template-columns: minmax(160px, 1fr) minmax(160px, 1fr) minmax(140px, auto);
+  align-items: stretch;
+  gap: 10px;
+}
+
+.currency-choice.compact {
+  min-height: 52px;
+  padding: 8px 10px;
+}
+
+.btn-save-inline {
+  min-height: 52px;
+  width: 100%;
+  padding-inline: 18px;
+  white-space: nowrap;
+}
+
+@media (max-width: 760px) {
+  .currency-save-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* =========================================================
+   AJUSTES SOLICITADOS - INICIO Y MOVIMIENTOS
+   Propósito: mejorar lectura de montos, colores por moneda y acciones del formulario.
+========================================================= */
+
+/* Propósito: mantener los encabezados principales de Ingreso/Egreso en gris. */
+.home-excel-table .home-th-income,
+.home-excel-table .home-th-expense {
+  background: #f3f4f6 !important;
+  color: #4b5563 !important;
+  border-color: #d1d5db !important;
+}
+
+/* Propósito: dar fondo gris claro a las columnas de Ingreso y Egreso sin perder el color por moneda. */
+.home-excel-table tbody td:nth-child(4),
+.home-excel-table tbody td:nth-child(5),
+.home-excel-table tbody td:nth-child(6),
+.home-excel-table tbody td:nth-child(7),
+.home-excel-table tfoot td:nth-child(4),
+.home-excel-table tfoot td:nth-child(5),
+.home-excel-table tfoot td:nth-child(6),
+.home-excel-table tfoot td:nth-child(7) {
+  background-color: #f9fafb !important;
+}
+
+/* Propósito: mantener Dólares en azul rey. */
+.home-excel-table thead .home-currency-head th:nth-child(odd),
+.home-excel-table tbody td:nth-child(4),
+.home-excel-table tbody td:nth-child(6),
+.home-excel-table tbody td:nth-child(8),
+.home-excel-table tfoot td:nth-child(4),
+.home-excel-table tfoot td:nth-child(6),
+.home-excel-table tfoot td:nth-child(8) {
+  color: #1d4ed8 !important;
+  font-weight: 800;
+}
+
+/* Propósito: mantener Pesos en verde. */
+.home-excel-table thead .home-currency-head th:nth-child(even),
+.home-excel-table tbody td:nth-child(5),
+.home-excel-table tbody td:nth-child(7),
+.home-excel-table tbody td:nth-child(9),
+.home-excel-table tfoot td:nth-child(5),
+.home-excel-table tfoot td:nth-child(7),
+.home-excel-table tfoot td:nth-child(9) {
+  color: #16a34a !important;
+  font-weight: 800;
+}
+
+/* Propósito: acomodar los botones de moneda en una fila y hacerlos más compactos. */
+.dashboard-currency-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.dashboard-currency-row .currency-choice.compact {
+  min-height: 44px;
+  padding: 7px 9px;
+  border-radius: 10px;
+}
+
+.dashboard-currency-row .currency-choice-symbol {
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  font-size: 0.76rem;
+}
+
+.dashboard-currency-row .currency-choice-text strong {
+  font-size: 0.82rem;
+}
+
+.dashboard-currency-row .currency-choice-text small {
+  font-size: 0.66rem;
+}
+
+.dashboard-currency-row .currency-choice-check {
+  font-size: 17px;
+}
+
+/* Propósito: dejar Limpiar y Guardar debajo de los botones de moneda. */
+.dashboard-form-actions {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.dashboard-form-actions .btn {
+  width: 100%;
+}
+
+/* Propósito: fila de total semanal dentro de las tablas de Movimientos. */
+.history-table tfoot td {
+  background: #f3f4f6 !important;
+  color: #111827;
+  font-weight: 900;
+  border-top: 2px solid #cbd5e1;
+  text-align: center !important;
+  font-variant-numeric: tabular-nums;
+}
+
+.history-total-row td:first-child {
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #374151;
+}
+
+.history-total-row td:nth-child(2) {
+  color: #1d4ed8;
+}
+
+.history-total-row td:nth-child(3) {
+  color: #16a34a;
+}
+
+@media (max-width: 760px) {
+  .dashboard-currency-row,
+  .dashboard-form-actions {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* =========================================================
+   AJUSTES FINALES SOLICITADOS - COLORES, BOTONES Y ANCHOS
+========================================================= */
+
+/* Propósito: dar fondo azul rey a las columnas de Dólares en Inicio. */
+.home-excel-table thead .home-currency-head th:nth-child(odd),
+.home-excel-table tbody td:nth-child(4),
+.home-excel-table tbody td:nth-child(6),
+.home-excel-table tbody td:nth-child(8),
+.home-excel-table tfoot td:nth-child(4),
+.home-excel-table tfoot td:nth-child(6),
+.home-excel-table tfoot td:nth-child(8) {
+  background-color: #dbeafe !important;
+  color: #1d4ed8 !important;
+  border-color: #93c5fd !important;
+  font-weight: 800;
+}
+
+/* Propósito: dar fondo verde a las columnas de Pesos en Inicio. */
+.home-excel-table thead .home-currency-head th:nth-child(even),
+.home-excel-table tbody td:nth-child(5),
+.home-excel-table tbody td:nth-child(7),
+.home-excel-table tbody td:nth-child(9),
+.home-excel-table tfoot td:nth-child(5),
+.home-excel-table tfoot td:nth-child(7),
+.home-excel-table tfoot td:nth-child(9) {
+  background-color: #dcfce7 !important;
+  color: #15803d !important;
+  border-color: #86efac !important;
+  font-weight: 800;
+}
+
+/* Propósito: mantener los encabezados principales Ingreso/Egreso en gris. */
+.home-excel-table .home-th-income,
+.home-excel-table .home-th-expense {
+  background: #f3f4f6 !important;
+  color: #4b5563 !important;
+  border-color: #d1d5db !important;
+}
+
+/* Propósito: colorear columnas Dólares/Pesos en tablas de movimientos y reportes. */
+.history-table tbody td:nth-child(6),
+.report-table tbody td:nth-child(6),
+.history-table tfoot td:nth-child(6),
+.report-table tfoot td:nth-child(6) {
+  background-color: #dbeafe !important;
+  color: #1d4ed8 !important;
+  border-color: #93c5fd !important;
+  font-weight: 800;
+}
+
+.history-table tbody td:nth-child(7),
+.report-table tbody td:nth-child(7),
+.history-table tfoot td:nth-child(7),
+.report-table tfoot td:nth-child(7) {
+  background-color: #dcfce7 !important;
+  color: #15803d !important;
+  border-color: #86efac !important;
+  font-weight: 800;
+}
+
+/* Propósito: hacer más compactos los botones Dólares/Pesos en Movimientos. */
+.pagina-dashboard .dashboard-currency-row {
+  display: flex !important;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.pagina-dashboard .dashboard-currency-row .currency-choice.compact {
+  flex: 0 0 auto;
+  width: 132px;
+  min-height: 40px;
+  padding: 6px 8px;
+  border-radius: 10px;
+  gap: 7px;
+}
+
+.pagina-dashboard .dashboard-currency-row .currency-choice-symbol {
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  font-size: 0.72rem;
+}
+
+.pagina-dashboard .dashboard-currency-row .currency-choice-text strong {
+  font-size: 0.78rem;
+}
+
+.pagina-dashboard .dashboard-currency-row .currency-choice-text small {
+  display: none;
+}
+
+.pagina-dashboard .dashboard-currency-row .currency-choice-check {
+  font-size: 16px;
+}
+
+/* Propósito: hacer menos anchos Limpiar y Guardar y mantenerlos debajo de moneda. */
+.pagina-dashboard .dashboard-form-actions {
+  grid-column: 1 / -1;
+  display: flex !important;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.pagina-dashboard .dashboard-form-actions .btn {
+  width: auto !important;
+  min-width: 108px;
+  padding: 9px 13px;
+  border-radius: 8px;
+  font-size: 0.86rem;
+}
+
+.pagina-dashboard .dashboard-form-actions .btn .material-icons-outlined {
+  font-size: 18px;
+}
+
+/* Propósito: aprovechar mejor el espacio de Concepto en tablas de Movimientos. */
+.pagina-dashboard .history-table {
+  min-width: 860px;
+  table-layout: fixed;
+}
+
+.pagina-dashboard .history-table thead th:nth-child(1),
+.pagina-dashboard .history-table tbody td:nth-child(1) {
+  width: 54px;
+}
+
+.pagina-dashboard .history-table thead th:nth-child(2),
+.pagina-dashboard .history-table tbody td:nth-child(2) {
+  width: 96px;
+}
+
+.pagina-dashboard .history-table thead th:nth-child(3),
+.pagina-dashboard .history-table tbody td:nth-child(3) {
+  width: 74px;
+}
+
+.pagina-dashboard .history-table thead th:nth-child(4),
+.pagina-dashboard .history-table tbody td:nth-child(4) {
+  width: 140px;
+}
+
+.pagina-dashboard .history-table thead th:nth-child(5),
+.pagina-dashboard .history-table tbody td:nth-child(5) {
+  width: auto;
+  text-align: left !important;
+  white-space: pre-line !important;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+.pagina-dashboard .history-table thead th:nth-child(6),
+.pagina-dashboard .history-table tbody td:nth-child(6),
+.pagina-dashboard .history-table tfoot td:nth-child(6),
+.pagina-dashboard .history-table thead th:nth-child(7),
+.pagina-dashboard .history-table tbody td:nth-child(7),
+.pagina-dashboard .history-table tfoot td:nth-child(7) {
+  width: 92px;
+  white-space: nowrap;
+}
+
+.pagina-dashboard .history-total-row td:first-child {
+  text-align: right !important;
+  padding-right: 16px;
+}
+
+@media (max-width: 720px) {
+  .pagina-dashboard .dashboard-currency-row,
+  .pagina-dashboard .dashboard-form-actions {
+    justify-content: stretch;
+  }
+
+  .pagina-dashboard .dashboard-currency-row .currency-choice.compact,
+  .pagina-dashboard .dashboard-form-actions .btn {
+    width: 100% !important;
+  }
+}
+
+
+/* =========================================================
+   AJUSTES FINALES: CONCEPTO CENTRADO, ACCIONES COMPACTAS
+========================================================= */
+/* Propósito: centrar nuevamente el texto de Concepto en Movimientos. */
+.pagina-dashboard .history-table tbody td.concept-cell,
+.pagina-dashboard .history-table tbody td:nth-child(5) {
+  text-align: center !important;
+  vertical-align: middle !important;
+  white-space: normal !important;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+/* Propósito: centrar el texto "Total de la semana" como estaba antes. */
+.pagina-dashboard .history-total-row .total-week-label,
+.pagina-dashboard .history-total-row td:first-child {
+  text-align: center !important;
+  padding-right: 8px !important;
+}
+
+/* Propósito: mantener las acciones de Reportes como botones pequeños a un costado. */
+.report-table {
+  table-layout: fixed;
+}
+
+.report-table .report-actions-header,
+.report-table .report-actions-cell {
+  width: 108px !important;
+  min-width: 108px !important;
+  max-width: 108px !important;
+  padding: 6px 4px !important;
+  background: transparent !important;
+  border-left-color: transparent !important;
+  border-right-color: transparent !important;
+  box-shadow: none !important;
+}
+
+.report-table .report-actions-header {
+  color: transparent !important;
+}
+
+.report-row-actions {
+  min-width: 0 !important;
+  width: auto !important;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  flex-wrap: nowrap;
+}
+
+.btn-icon-action {
+  width: 30px !important;
+  height: 30px !important;
+  min-width: 30px !important;
+  padding: 0 !important;
+  border-radius: 8px !important;
+  gap: 0 !important;
+  font-size: 0 !important;
+}
+
+.btn-icon-action .material-icons-outlined {
+  font-size: 17px !important;
+  line-height: 1 !important;
+}
+
+.btn-adjustment-row {
+  background: #fff7ed;
+  color: #9a3412;
+  border: 1px solid #fed7aa;
+}
+
+.btn-adjustment-row:hover:not(:disabled) {
+  background: #ffedd5;
+}
+
+.btn-edit-row {
+  background: #eef4ff !important;
+  color: #174ea6 !important;
+  border: 1px solid #bfdbfe !important;
+}
+
+.btn-print-row {
+  background: #f8fafc;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+}
+
+.btn-print-row:hover:not(:disabled) {
+  background: #e2e8f0;
+}
+
+.btn-delete-row {
+  background: #fee2e2 !important;
+  color: #b91c1c !important;
+  border: 1px solid #fecaca !important;
+}
+
+.btn-delete-row:hover:not(:disabled) {
+  background: #fecaca !important;
+}
+
+@media (max-width: 820px) {
+  .report-table .report-actions-header,
+  .report-table .report-actions-cell {
+    width: 96px !important;
+    min-width: 96px !important;
+    max-width: 96px !important;
+  }
+
+  .btn-icon-action {
+    width: 28px !important;
+    height: 28px !important;
+    min-width: 28px !important;
+  }
+}
+
+
+/* =========================================================
+   AJUSTES: MOVIMIENTOS CONCEPTO CENTRADO Y REPORTES ACCIONES
+========================================================= */
+/* Propósito: centrar también el título de la columna Concepto en Movimientos. */
+.pagina-dashboard .history-table thead th:nth-child(5) {
+  text-align: center !important;
+}
+
+/* Propósito: mantener los botones de Reportes dentro de la columna Acciones. */
+.report-table .report-actions-header,
+.report-table .report-actions-cell {
+  width: 118px !important;
+  min-width: 118px !important;
+  max-width: 118px !important;
+  padding: 7px 6px !important;
+  background: inherit !important;
+  border-left-color: #e5e7eb !important;
+  border-right-color: #e5e7eb !important;
+  box-shadow: none !important;
+  text-align: center !important;
+}
+
+.report-table .report-actions-header {
+  color: #334155 !important;
+  font-weight: 800 !important;
+}
+
+.report-row-actions {
+  width: 100% !important;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  flex-wrap: nowrap;
+}
+
+/* Propósito: centrar la fila de total en Reportes. */
+.report-total-row .total-week-label {
+  text-align: center !important;
+  font-weight: 800 !important;
+}
+
+/* Propósito: conservar la fila cancelada en rojo aun cuando sus datos se muestran como --. */
+.report-table tbody tr.report-row-cancelado td {
+  background-color: #ffe1e1 !important;
+  color: #8a1f1f !important;
+  border-color: #f3b6b6 !important;
+}
+
+.report-table tbody tr.report-row-cancelado:hover td {
+  background-color: #ffd1d1 !important;
+}
+
+@media (max-width: 820px) {
+  .report-table .report-actions-header,
+  .report-table .report-actions-cell {
+    width: 108px !important;
+    min-width: 108px !important;
+    max-width: 108px !important;
+  }
+}
+
+/* =========================================================
+   AJUSTE: REPORTES CON ACCIONES AZULES Y COLUMNAS COMPACTAS
+   Propósito: dar prioridad visual a Concepto y Comentario sin sacar acciones de la tabla.
+========================================================= */
+
+/* Propósito: mantener la columna Acciones con el mismo estilo de encabezado que el resto. */
+body.modo-ingreso .report-table thead th.report-actions-header,
+body.modo-cancelado .report-table thead th.report-actions-header {
+  background: #86dfe6 !important;
+  color: #111111 !important;
+  border-left-color: rgba(17, 17, 17, 0.12) !important;
+  border-right-color: rgba(17, 17, 17, 0.12) !important;
+}
+
+/* Propósito: en egresos, acciones conserva el mismo tono del resto de encabezados de egresos. */
+body.modo-egreso .report-table thead th.report-actions-header {
+  background: #f0dc84 !important;
+  color: #111111 !important;
+  border-left-color: rgba(17, 17, 17, 0.12) !important;
+  border-right-color: rgba(17, 17, 17, 0.12) !important;
+}
+
+/* Propósito: en historial/cancelados, asegurar que todos los encabezados se vean con tono azul uniforme. */
+body.modo-cancelado .report-table thead th {
+  background: #86dfe6 !important;
+  color: #111111 !important;
+}
+
+/* Propósito: evitar que Acciones se pinte transparente por reglas anteriores. */
+.report-table .report-actions-header {
+  font-weight: 800 !important;
+  text-transform: uppercase;
+  white-space: nowrap !important;
+}
+
+/* Propósito: ajustar la tabla principal de reportes para dar más espacio a Concepto. */
+.report-table:not(.edit-history-table) {
+  table-layout: fixed !important;
+  min-width: 980px;
+}
+
+.report-table:not(.edit-history-table) thead th:nth-child(1),
+.report-table:not(.edit-history-table) tbody td:nth-child(1) {
+  width: 5.5% !important;
+  min-width: 48px !important;
+  max-width: 60px !important;
+  padding-left: 6px !important;
+  padding-right: 6px !important;
+}
+
+.report-table:not(.edit-history-table) thead th:nth-child(2),
+.report-table:not(.edit-history-table) tbody td:nth-child(2) {
+  width: 9% !important;
+  min-width: 78px !important;
+  max-width: 98px !important;
+  padding-left: 7px !important;
+  padding-right: 7px !important;
+}
+
+.report-table:not(.edit-history-table) thead th:nth-child(3),
+.report-table:not(.edit-history-table) tbody td:nth-child(3) {
+  width: 8% !important;
+  min-width: 70px !important;
+  max-width: 86px !important;
+  padding-left: 7px !important;
+  padding-right: 7px !important;
+}
+
+.report-table:not(.edit-history-table) thead th:nth-child(4),
+.report-table:not(.edit-history-table) tbody td:nth-child(4) {
+  width: 14% !important;
+  min-width: 115px !important;
+  max-width: 150px !important;
+}
+
+.report-table:not(.edit-history-table) thead th:nth-child(5),
+.report-table:not(.edit-history-table) tbody td:nth-child(5) {
+  width: 34% !important;
+  min-width: 260px !important;
+  max-width: none !important;
+  white-space: normal !important;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+.report-table:not(.edit-history-table) thead th:nth-child(6),
+.report-table:not(.edit-history-table) tbody td:nth-child(6),
+.report-table:not(.edit-history-table) tfoot td:nth-child(6),
+.report-table:not(.edit-history-table) thead th:nth-child(7),
+.report-table:not(.edit-history-table) tbody td:nth-child(7),
+.report-table:not(.edit-history-table) tfoot td:nth-child(7) {
+  width: 8.5% !important;
+  min-width: 76px !important;
+  max-width: 92px !important;
+  padding-left: 6px !important;
+  padding-right: 6px !important;
+  white-space: nowrap !important;
+}
+
+.report-table:not(.edit-history-table) .report-actions-header,
+.report-table:not(.edit-history-table) .report-actions-cell {
+  width: 12.5% !important;
+  min-width: 102px !important;
+  max-width: 118px !important;
+  padding-left: 4px !important;
+  padding-right: 4px !important;
+}
+
+/* Propósito: ajustar la tabla de historial para priorizar Concepto y Comentario. */
+.edit-history-table {
+  table-layout: fixed !important;
+  min-width: 1180px;
+}
+
+.edit-history-table thead th:nth-child(1),
+.edit-history-table tbody td:nth-child(1) {
+  width: 5% !important;
+  min-width: 46px !important;
+  padding-left: 6px !important;
+  padding-right: 6px !important;
+}
+
+.edit-history-table thead th:nth-child(2),
+.edit-history-table tbody td:nth-child(2) {
+  width: 8% !important;
+  min-width: 80px !important;
+  padding-left: 7px !important;
+  padding-right: 7px !important;
+}
+
+.edit-history-table thead th:nth-child(3),
+.edit-history-table tbody td:nth-child(3) {
+  width: 8% !important;
+  min-width: 76px !important;
+  padding-left: 7px !important;
+  padding-right: 7px !important;
+}
+
+.edit-history-table thead th:nth-child(4),
+.edit-history-table tbody td:nth-child(4) {
+  width: 12% !important;
+  min-width: 125px !important;
+}
+
+.edit-history-table thead th:nth-child(5),
+.edit-history-table tbody td:nth-child(5) {
+  width: 23% !important;
+  min-width: 250px !important;
+}
+
+.edit-history-table thead th:nth-child(6),
+.edit-history-table tbody td:nth-child(6),
+.edit-history-comment-cell {
+  width: 21% !important;
+  min-width: 230px !important;
+}
+
+.edit-history-table thead th:nth-child(7),
+.edit-history-table tbody td:nth-child(7),
+.edit-history-table thead th:nth-child(8),
+.edit-history-table tbody td:nth-child(8) {
+  width: 7% !important;
+  min-width: 78px !important;
+  padding-left: 6px !important;
+  padding-right: 6px !important;
+  white-space: nowrap !important;
+}
+
+.edit-history-table thead th:nth-child(9),
+.edit-history-table tbody td:nth-child(9) {
+  width: 9% !important;
+  min-width: 96px !important;
+  padding-left: 7px !important;
+  padding-right: 7px !important;
+  white-space: normal !important;
+}
+
+/* Propósito: permitir lectura cómoda en las columnas largas de historial. */
+.edit-history-table tbody td:nth-child(4),
+.edit-history-table tbody td:nth-child(5),
+.edit-history-table tbody td:nth-child(6) {
+  white-space: normal !important;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+/* Propósito: compactar botones para que Acciones no quite espacio a Concepto. */
+.report-row-actions {
+  gap: 4px !important;
+}
+
+.report-row-actions .btn-icon-action {
+  width: 28px !important;
+  height: 28px !important;
+  min-width: 28px !important;
+}
+
+/* =========================================================
+   FIX: HISTORIAL DE EDICIONES Y CANCELACIÓN TEMPORAL
+   Propósito: evitar que las columnas se recorran visualmente en historial.
+========================================================= */
+/* Propósito: en Historial de ediciones, Comentario debe conservar fondo claro normal. */
+.edit-history-table tbody td:nth-child(6),
+.edit-history-table tfoot td:nth-child(6),
+.edit-history-table .edit-history-comment-cell {
+  background-color: #ffffff !important;
+  color: #374151 !important;
+  border-color: #e5e7eb !important;
+  font-weight: 600 !important;
+}
+
+/* Propósito: en Historial de ediciones, Dólares debe conservar el fondo azul. */
+.edit-history-table tbody td:nth-child(7),
+.edit-history-table tfoot td:nth-child(7) {
+  background-color: #dbeafe !important;
+  color: #1d4ed8 !important;
+  border-color: #93c5fd !important;
+  font-weight: 800 !important;
+}
+
+/* Propósito: en Historial de ediciones, Pesos debe conservar el fondo verde. */
+.edit-history-table tbody td:nth-child(8),
+.edit-history-table tfoot td:nth-child(8) {
+  background-color: #dcfce7 !important;
+  color: #15803d !important;
+  border-color: #86efac !important;
+  font-weight: 800 !important;
+}
+
+/* Propósito: Fecha ajuste debe verse como dato normal, no como moneda. */
+.edit-history-table tbody td:nth-child(9),
+.edit-history-table tfoot td:nth-child(9) {
+  background-color: #ffffff !important;
+  color: #374151 !important;
+  border-color: #e5e7eb !important;
+  font-weight: 600 !important;
+}
+
+/* =========================================================
+   MODAL FORMAL PARA CONFIRMAR CANCELACIÓN
+========================================================= */
+.cancel-confirm-modal-card {
+  width: min(560px, 100%);
+  padding: 24px;
+}
+
+.cancel-confirm-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.cancel-confirm-icon {
+  width: 54px;
+  height: 54px;
+  border-radius: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
+.cancel-confirm-icon .material-icons-outlined {
+  font-size: 30px;
+}
+
+.cancel-confirm-content h2 {
+  margin: 0 0 8px;
+  color: #111827;
+  font-size: 1.35rem;
+  font-weight: 800;
+}
+
+.cancel-confirm-content p {
+  margin: 0;
+  color: #4b5563;
+  line-height: 1.55;
+  font-size: 0.95rem;
+}
+
+.cancel-confirm-summary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 18px;
+  padding: 14px;
+  border-radius: 18px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+}
+
+.cancel-confirm-summary div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.cancel-confirm-summary span {
+  color: #6b7280;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.cancel-confirm-summary strong {
+  color: #111827;
+  font-size: 0.95rem;
+  font-weight: 800;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cancel-confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.btn-danger-formal {
+  background: #dc2626;
+  color: #ffffff;
+  border: 1px solid #b91c1c;
+}
+
+.btn-danger-formal:hover:not(:disabled) {
+  background: #b91c1c;
+  border-color: #991b1b;
+}
+
+.btn-danger-formal:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.btn-danger-formal .material-icons-outlined {
+  font-size: 18px;
+}
+
+@media (max-width: 640px) {
+  .cancel-confirm-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .cancel-confirm-actions {
+    flex-direction: column-reverse;
+  }
+
+  .cancel-confirm-actions .btn {
+    width: 100%;
+  }
+}
+
+/* =========================================================
+   TICKET TÉRMICO / RECIBO 80MM
+   Propósito: adaptar la vista previa y la impresión a un
+   formato compacto tipo ticket de tienda.
+========================================================= */
+
+/* Propósito: mostrar la vista previa con ancho similar al ticket real. */
+.preview-canvas {
+  display: flex;
+  justify-content: center;
+  overflow-x: auto;
+}
+
+/* Propósito: ajustar la etiqueta de pantalla a un formato de recibo de 80mm. */
+.label-sheet {
+  width: 80mm;
+  max-width: 100%;
+  min-height: auto;
+  border-radius: 8px;
+  padding: 14px 12px;
+}
+
+/* Propósito: compactar el encabezado del ticket para que quepa en papel térmico. */
+.label-top {
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px dashed #111111;
+  padding-bottom: 8px;
+  margin-bottom: 8px;
+}
+
+/* Propósito: evitar que el logo ocupe demasiado espacio en el ticket. */
+.label-brand img {
+  width: 34px;
+  height: 34px;
+}
+
+/* Propósito: compactar textos del encabezado de la etiqueta. */
+.label-brand h3 {
+  font-size: 0.9rem;
+}
+
+.label-brand p {
+  font-size: 0.72rem;
+}
+
+/* Propósito: hacer el folio más pequeño para formato ticket. */
+.label-code-box {
+  min-width: 84px;
+  border-radius: 8px;
+  padding: 8px 9px;
+}
+
+.label-code-box strong {
+  font-size: 0.78rem;
+}
+
+/* Propósito: mostrar los datos en una sola columna para mejor lectura. */
+.label-row {
+  grid-template-columns: 1fr;
+  gap: 6px;
+}
+
+/* Propósito: compactar cada campo del ticket. */
+.label-field {
+  min-height: auto;
+  border-radius: 8px;
+  padding: 7px 8px;
+}
+
+.field-title {
+  font-size: 0.65rem;
+  letter-spacing: 0.07em;
+}
+
+.label-field span:last-child {
+  font-size: 0.82rem;
+}
+
+/* Propósito: hacer más compacto el pie del ticket. */
+.label-footer {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed #111111;
+}
+
+.barcode {
+  height: 34px;
+}
+
+.signature-area {
+  margin-top: 18px;
+  padding-top: 16px;
+}
+
+.signature-label {
+  font-size: 10px;
+}
+
+.signature-note,
+.print-note {
+  font-size: 9px;
+}
+
+@media print {
+  @page {
+    size: 80mm auto;
+    margin: 0;
+  }
+
+  /* Propósito: ocultar todo menos la etiqueta al imprimir desde Movimientos. */
+  body * {
+    visibility: hidden !important;
+  }
+
+  /* Propósito: imprimir únicamente el recibo. */
+  .label-sheet,
+  .label-sheet * {
+    visibility: visible !important;
+  }
+
+  /* Propósito: posicionar el recibo al inicio del papel térmico. */
+  .label-sheet {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 80mm !important;
+    max-width: 80mm !important;
+    min-height: auto !important;
+    padding: 4mm 3mm !important;
+    margin: 0 !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    font-family: Arial, Helvetica, sans-serif !important;
+  }
+
+  /* Propósito: quitar fondos decorativos y sombras en impresión. */
+  .label-sheet * {
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  .label-top {
+    border-bottom: 1px dashed #000000 !important;
+  }
+
+  .label-code-box {
+    background: #ffffff !important;
+    color: #000000 !important;
+    border: 1px solid #000000 !important;
+  }
+
+  .label-mini-title {
+    color: #000000 !important;
+  }
+
+  .label-field {
+    background: #ffffff !important;
+    border: none !important;
+    border-bottom: 1px dotted #9ca3af !important;
+    border-radius: 0 !important;
+    padding: 3px 0 !important;
+  }
+
+  .field-title {
+    color: #000000 !important;
+    font-weight: 800 !important;
+  }
+
+  .label-footer {
+    border-top: 1px dashed #000000 !important;
+  }
+
+  .barcode {
+    border-color: #000000 !important;
+  }
+
+  .signature-line {
+    background: #000000 !important;
+  }
+}
+
+/* =========================================================
+   AJUSTE DE ETIQUETA: TEXTO CENTRADO Y UNA SOLA IMPRESIÓN
+========================================================= */
+/* Propósito: centrar todo el contenido visible de la etiqueta en Movimientos. */
+.label-sheet,
+.label-sheet * {
+  text-align: center;
+}
+
+/* Propósito: centrar el encabezado de la etiqueta para igualarlo con la impresión de Reportes. */
+.label-top {
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+/* Propósito: centrar logo, título y subtítulo de la marca. */
+.label-brand {
+  width: 100%;
+  justify-content: center;
+  text-align: center;
+}
+
+/* Propósito: centrar el recuadro del folio. */
+.label-code-box {
+  align-items: center;
+  text-align: center;
+}
+
+/* Propósito: centrar los campos de datos dentro de la etiqueta. */
+.label-field {
+  align-items: center;
+  text-align: center;
+}
+
+/* Propósito: centrar los textos largos sin romper el ancho del ticket. */
+.label-field span:last-child {
+  text-align: center;
+}
+
+/* Propósito: centrar el pie, código visual, firma y nota final. */
+.label-footer,
+.barcode-box,
+.signature-area,
+.print-note {
+  align-items: center;
+  text-align: center;
+}
+
+@media print {
+  /* Propósito: evitar hojas extra cuando se imprima directamente desde la pantalla de Movimientos. */
+  html,
+  body {
+    width: 80mm !important;
+    min-width: 80mm !important;
+    max-width: 80mm !important;
+    min-height: 0 !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    background: #ffffff !important;
+  }
+
+  /* Propósito: conservar visible solo la etiqueta y eliminar espacio extra del layout. */
+  #root {
+    width: 80mm !important;
+    min-height: 0 !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+  }
+
+  /* Propósito: posicionar la etiqueta como único contenido imprimible. */
+  .label-sheet {
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 80mm !important;
+    max-width: 80mm !important;
+    min-height: 0 !important;
+    height: auto !important;
+    margin: 0 auto !important;
+    padding: 4mm 3mm !important;
+    overflow: hidden !important;
+    text-align: center !important;
+  }
+
+  /* Propósito: mantener todo el texto centrado también al imprimir. */
+  .label-sheet,
+  .label-sheet *,
+  .label-top,
+  .label-brand,
+  .label-code-box,
+  .label-field,
+  .label-field span:last-child,
+  .label-footer,
+  .barcode-box,
+  .signature-area,
+  .print-note {
+    text-align: center !important;
+  }
+
+  .label-top {
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .label-brand {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
+  .label-code-box,
+  .label-field,
+  .label-footer,
+  .barcode-box {
+    align-items: center !important;
+  }
+}
+
+/* =========================================================
+   AJUSTE FINAL DE CENTRADO PARA ETIQUETA
+   Propósito: evitar que el logotipo y el texto se vean desalineados.
+========================================================= */
+.label-sheet {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.label-top,
+.label-brand,
+.label-code-box,
+.label-body,
+.label-field,
+.label-footer,
+.barcode-box,
+.signature-area,
+.print-note {
+  text-align: center;
+}
+
+.label-brand {
+  width: 100%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.label-brand img {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.label-brand div {
+  width: 100%;
+}
+
+.label-code-box,
+.label-field,
+.label-footer,
+.barcode-box {
+  align-items: center;
+}
+
+@media print {
+  /* Propósito: centrar la etiqueta dentro de la hoja elegida en el diálogo de impresión. */
+  html,
+  body,
+  #root {
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: none !important;
+  }
+
+  .label-sheet {
+    position: relative !important;
+    left: auto !important;
+    right: auto !important;
+    top: auto !important;
+    width: 80mm !important;
+    max-width: 80mm !important;
+    margin: 4mm auto 0 !important;
+  }
+
+  .label-brand {
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+}
+
+/* =========================================================
+   CONTROL SEMANAL - CONFIGURACIÓN INTEGRADA
+========================================================= */
+/* Propósito: integrar la configuración del periodo dentro del encabezado del control semanal. */
+.home-control-header {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 24px;
+  border-bottom: 1px solid #edf0f3;
+  background: linear-gradient(135deg, #ffffff 0%, #fbfcfe 100%);
+}
+
+.home-control-topline {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.home-control-title-block {
+  max-width: none;
+}
+
+.home-control-title-row {
+  margin-bottom: 0;
+}
+
+.home-period-config {
+  padding: 16px;
+  border: 1px solid #e4e7ec;
+  border-radius: 18px;
+  background: #f8fafc;
+}
+
+.home-period-config-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.home-period-config-heading h3 {
+  margin: 0;
+  color: #101828;
+  font-size: 0.98rem;
+  line-height: 1.25;
+}
+
+.home-period-config-heading p {
+  margin: 3px 0 0;
+  color: #667085;
+  font-size: 0.85rem;
+  line-height: 1.35;
+}
+
+.home-period-config .home-filters-row {
+  grid-template-columns: minmax(150px, 0.75fr) minmax(240px, 1.2fr) minmax(190px, 1fr) minmax(190px, 1fr);
+  gap: 12px;
+}
+
+.home-period-config .home-filter-card {
+  padding: 12px;
+  border-color: #dfe5ee;
+  background: #ffffff;
+}
+
+.home-period-config .home-filter-card label {
+  color: #344054;
+  font-size: 0.74rem;
+}
+
+.home-period-config .home-filter-card .filter-control {
+  height: 40px;
+}
+
+.home-control-topline .home-balance-auto-chip {
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 1180px) {
+  .home-control-topline,
+  .home-period-config-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .home-period-config .home-filters-row {
+    grid-template-columns: repeat(2, minmax(220px, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .home-control-header {
+    padding: 18px;
+  }
+
+  .home-period-config {
+    padding: 14px;
+  }
+
+  .home-period-config .home-filters-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* =========================================================
+   CONTROL SEMANAL - CAMPOS ALINEADOS
+========================================================= */
+/* Propósito: dejar el control semanal con una fila limpia de campos, sin encabezados repetidos o elementos que desalineen la vista. */
+.home-control-header-fields-only {
+  display: block;
+  padding: 18px 24px 20px;
+  border-bottom: 1px solid #edf0f3;
+  background: #ffffff;
+}
+
+/* Propósito: distribuir periodo, semana y saldos en una sola línea alineada con el ancho de la tabla. */
+.home-control-fields-grid {
+  display: grid;
+  grid-template-columns: minmax(170px, 0.85fr) minmax(270px, 1.45fr) minmax(230px, 1.1fr) minmax(230px, 1.1fr);
+  align-items: stretch;
+  gap: 12px;
+  width: 100%;
+  margin: 0;
+}
+
+/* Propósito: mantener todos los campos con la misma altura y lectura visual. */
+.home-control-fields-grid .home-filter-card {
+  min-height: 88px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 12px;
+  border: 1px solid #dfe5ee;
+  border-radius: 14px;
+  background: #ffffff;
+}
+
+/* Propósito: hacer que las etiquetas superiores sean consistentes y legibles. */
+.home-control-fields-grid .home-filter-card label {
+  margin: 0;
+  color: #101828;
+  font-size: 0.72rem;
+  font-weight: 800;
+  line-height: 1.1;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+
+/* Propósito: alinear visualmente inputs y selects dentro de cada tarjeta. */
+.home-control-fields-grid .home-filter-card .filter-control {
+  width: 100%;
+  height: 40px;
+  margin-top: 8px;
+  border-radius: 10px;
+  border-color: #d0d5dd;
+  color: #101828;
+  background: #ffffff;
+  font-size: 0.92rem;
+}
+
+/* Propósito: dejar la unidad monetaria alineada sin mover el input. */
+.home-control-fields-grid .home-money-card small {
+  right: 24px;
+  bottom: 24px;
+}
+
+/* Propósito: evitar saltos o desalineación en pantallas medianas. */
+@media (max-width: 1180px) {
+  .home-control-fields-grid {
+    grid-template-columns: repeat(2, minmax(220px, 1fr));
+  }
+}
+
+/* Propósito: adaptar los campos en celulares sin perder orden. */
+@media (max-width: 640px) {
+  .home-control-header-fields-only {
+    padding: 16px;
+  }
+
+  .home-control-fields-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* =========================================================
+   CONTROL SEMANAL - ENCABEZADO SIMPLE CON CAMPOS ALINEADOS
+========================================================= */
+/* Propósito: recuperar el título del control semanal sin volver a saturar el panel. */
+.home-control-header-fields-only {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px 24px 22px;
+  border-bottom: 1px solid #edf0f3;
+  background: #ffffff;
+}
+
+/* Propósito: alinear el título, subtítulo y estado en una zona clara antes de los campos. */
+.home-control-intro {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+}
+
+/* Propósito: evitar que el encabezado se extienda demasiado y pierda lectura. */
+.home-control-intro-text {
+  min-width: 0;
+}
+
+/* Propósito: mostrar “Resumen semanal” como una referencia discreta. */
+.home-control-intro .home-section-kicker {
+  margin-bottom: 7px;
+  color: #475467;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.11em;
+}
+
+/* Propósito: mantener el título y la etiqueta de saldo alineados en la misma línea. */
+.home-control-intro .home-control-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+}
+
+/* Propósito: darle presencia al título sin hacerlo pesado. */
+.home-control-intro .home-control-title-row h2 {
+  margin: 0;
+  color: #101828;
+  font-size: 1.22rem;
+  line-height: 1.2;
+  font-weight: 800;
+}
+
+/* Propósito: dejar el detalle de la semana como subtítulo limpio. */
+.home-control-intro p {
+  margin: 6px 0 0;
+  color: #667085;
+  font-size: 0.86rem;
+  line-height: 1.35;
+}
+
+/* Propósito: hacer que la etiqueta de saldo se vea ligera y no compita con el título. */
+.home-control-intro .home-status-chip {
+  min-height: 26px;
+  padding: 4px 10px;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+/* Propósito: mantener los campos perfectamente alineados debajo del encabezado. */
+.home-control-header-fields-only .home-control-fields-grid {
+  margin-top: 0;
+}
+
+@media (max-width: 640px) {
+  .home-control-header-fields-only {
+    padding: 16px;
+    gap: 14px;
+  }
+
+  .home-control-intro .home-control-title-row {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+
+/* =========================================================
+   CONTROL SEMANAL - SOLO ETIQUETA SUPERIOR
+========================================================= */
+/* Propósito: dejar el bloque de control semanal con un encabezado mínimo y campos alineados. */
+.home-control-intro-only {
+  align-items: center;
+  justify-content: flex-start;
+  min-height: auto;
+}
+
+/* Propósito: quitar espacio extra cuando el encabezado solo muestra “Resumen semanal”. */
+.home-control-intro-only .home-section-kicker {
+  display: inline-block;
+  margin-bottom: 0;
+}
+
+
+/* =========================================================
+   CONTROL SEMANAL - TÍTULO Y EXPORTACIÓN
+========================================================= */
+/* Propósito: dejar solo el título Control semanal, bien alineado con el botón de exportación. */
+.home-control-intro-weekly {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  margin-bottom: 2px;
+}
+
+/* Propósito: conservar la misma presencia visual del título anterior sin agregar subtítulos extra. */
+.home-control-intro-weekly .home-control-title-row {
+  margin: 0;
+}
+
+/* Propósito: mantener el título con la fuente, color y peso visual original del bloque Control semanal. */
+.home-control-intro-weekly .home-control-title-row h2 {
+  margin: 0;
+  color: #101828;
+  font-size: 1.22rem;
+  line-height: 1.2;
+  font-weight: 800;
+}
+
+/* Propósito: alinear el botón Exportar con el título sin afectar los campos del periodo. */
+.home-weekly-export-btn {
+  min-height: 38px;
+  padding: 9px 14px;
+  white-space: nowrap;
+}
+
+.home-weekly-export-btn .material-icons-outlined {
+  font-size: 18px;
+}
+
+@media (max-width: 640px) {
+  .home-control-intro-weekly {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .home-weekly-export-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* =========================================================
+   CONTROL SEMANAL - EXPORTACIÓN COMO ÍCONO
+========================================================= */
+/* Propósito: mover la acción de exportar junto a la tabla y evitar el botón grande en el encabezado. */
+.home-table-actions-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 20px 0;
+}
+
+/* Propósito: mostrar una referencia discreta de la tabla sin competir con el contenido. */
+.home-table-actions-title {
+  color: #475467;
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* Propósito: reutilizar el estilo de acciones por ícono que ya usa Reportes. */
+.home-weekly-export-icon {
+  flex: 0 0 auto;
+  color: #175cd3;
+  background: #eff8ff;
+  border-color: #b9e6fe;
+}
+
+.home-weekly-export-icon:hover:not(:disabled) {
+  color: #ffffff;
+  background: #175cd3;
+  border-color: #175cd3;
+}
+
+/* Propósito: reducir el espacio superior de la tabla porque ahora tiene su propia barra de acciones. */
+.home-table-actions-row + .home-table-wrapper {
+  padding-top: 10px;
+}
+
+@media (max-width: 640px) {
+  .home-table-actions-row {
+    padding: 14px 16px 0;
+  }
+}
+
+
+
+/* =========================================================
+   CONCEPTO ESTRUCTURADO EN MOVIMIENTOS
+   Propósito: permitir que el concepto se capture con saltos de línea y se lea mejor en ticket.
+========================================================= */
+.concept-form-group .structured-concept-input {
+  min-height: 148px;
+  line-height: 1.45;
+  resize: vertical;
+  white-space: pre-wrap;
+}
+
+.concept-form-group .structured-concept-input::placeholder {
+  color: #94a3b8;
+  white-space: pre-line;
+}
+
+.field-helper {
+  display: block;
+  margin-top: 7px;
+  color: #64748b;
+  font-size: 0.78rem;
+  line-height: 1.35;
+}
+
+/* =========================================================
+   VISTA PREVIA REAL DEL TICKET 58MM EN MOVIMIENTOS
+   Propósito: mostrar el recibo con ancho real de ticket, pero con alto dinámico para que no se vea cortado.
+========================================================= */
+.thermal-preview-card {
+  overflow: hidden;
+}
+
+/* Propósito: centrar el ticket y dejar que el alto crezca según el contenido capturado. */
+.thermal-preview-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 18px;
+  max-height: none;
+  overflow: visible;
+  background:
+    linear-gradient(45deg, #f8fafc 25%, transparent 25%),
+    linear-gradient(-45deg, #f8fafc 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #f8fafc 75%),
+    linear-gradient(-45deg, transparent 75%, #f8fafc 75%);
+  background-color: #eef2f7;
+  background-size: 20px 20px;
+  background-position:
+    0 0,
+    0 10px,
+    10px -10px,
+    -10px 0;
+}
+
+/* Propósito: indicar que la previsualización representa el ticket físico. */
+.thermal-preview-size-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 10px;
+  border-radius: 999px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  color: #475569;
+  font-size: 0.78rem;
+  font-weight: 700;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+}
+
+.thermal-preview-size-note .material-icons-outlined {
+  font-size: 18px;
+}
+
+/* Propósito: representar el ancho real del papel térmico sin forzar una hoja larga en pantalla. */
+.thermal-print-page {
+  width: 58mm;
+  min-width: 58mm;
+  max-width: 58mm;
+  height: auto;
+  min-height: auto;
+  margin: 0 auto;
+  padding: 2mm 1mm 3mm;
+  background: #ffffff;
+  color: #000000;
+  font-family: Arial, Helvetica, sans-serif;
+  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.2);
+  outline: 1px dashed rgba(15, 23, 42, 0.28);
+  overflow: visible;
+}
+
+/* Propósito: usar un ancho útil interno para que el texto no choque con los bordes del preview. */
+.thermal-label-sheet {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  background: #ffffff;
+  color: #000000;
+  border: none;
+  box-shadow: none;
+  text-align: left;
+  line-height: 1;
+  overflow: visible;
+}
+
+.thermal-label-top {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 0.6mm;
+  padding-bottom: 1mm;
+  margin-bottom: 0.4mm;
+  border-bottom: 1px solid #000000;
+  text-align: left;
+}
+
+.thermal-label-brand {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 0.5mm;
+  text-align: left;
+}
+
+.thermal-label-brand img {
+  display: block;
+  width: 10mm;
+  height: 11mm;
+  object-fit: contain;
+  margin: 0;
+}
+
+.thermal-label-brand h3 {
+  margin: 0;
+  font-size: 22px;
+  line-height: 1.05;
+  font-weight: 800;
+  color: #000000;
+}
+
+.thermal-label-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  text-align: left;
+}
+
+/* Propósito: mostrar cada dato del comprobante igual que en el ticket, sin cortar valores largos. */
+.thermal-label-line {
+  display: block;
+  width: 100%;
+  padding: 1mm 0;
+  border-bottom: 1px dashed #000000;
+  color: #000000;
+  font-size: 15.5px;
+  line-height: 1.18;
+  font-weight: 400;
+  text-align: left;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+.thermal-label-line strong {
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.thermal-label-line span {
+  font-weight: 400;
+}
+
+/* Propósito: mostrar Nombre y Concepto con el título arriba y el valor justo debajo. */
+.thermal-label-line-stacked strong,
+.thermal-label-line-stacked span {
+  display: block;
+}
+
+.thermal-label-line-stacked span {
+  margin-top: 0.7mm;
+}
+
+/* Propósito: conservar saltos de línea del concepto dentro de la vista previa del ticket. */
+.thermal-label-line-concept .thermal-structured-text {
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  line-height: 1.22;
+}
+
+.thermal-label-footer {
+  margin-top: 8mm;
+  padding-top: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.2mm;
+  text-align: center;
+}
+
+/* Propósito: simular la zona de firma sin mandar la firma hasta el final de una hoja larga. */
+.thermal-signature-area {
+  width: 100%;
+  min-height: 26mm;
+  margin-top: 0;
+  padding-top: 20mm;
+  text-align: center;
+}
+
+.thermal-signature-line {
+  width: 82%;
+  height: 1px;
+  background: #000000;
+  margin: 0 auto 1.2mm;
+}
+
+.thermal-signature-label {
+  font-size: 15.5px;
+  line-height: 1.12;
+  font-weight: 400;
+  color: #000000;
+}
+
+.thermal-print-note {
+  margin-top: 0;
+  font-size: 15.5px;
+  line-height: 1.16;
+  font-weight: 400;
+  color: #000000;
+  text-transform: none;
+}
+
+@media (max-width: 640px) {
+  /* Propósito: permitir que el ticket conserve proporción sin romper pantallas pequeñas. */
+  .thermal-preview-stage {
+    align-items: flex-start;
+    overflow-x: auto;
+  }
+}
+
+
+/* =========================================================
+   HEADER RESPONSIVE PARA CELULAR
+   Propósito: alinear correctamente logo, navegación y acciones
+   cuando el sistema se abre desde pantalla móvil.
+========================================================= */
+@media (max-width: 640px) {
+  .topbar {
+    min-height: auto;
+    padding: 14px 14px 16px;
+    align-items: stretch;
+  }
+
+  .topbar-shell {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 12px;
+  }
+
+  .brand {
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .brand-logo-frame {
+    width: 54px;
+    height: 54px;
+    border-radius: 16px;
+  }
+
+  .brand-logo {
+    width: 48px;
+    height: 48px;
+  }
+
+  .brand-copy {
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .brand-name {
+    font-size: 1.18rem;
+    line-height: 1.05;
+  }
+
+  .brand-subtitle {
+    font-size: 0.84rem;
+    line-height: 1.15;
+  }
+
+  .top-nav {
+    width: 100%;
+    justify-self: stretch;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: stretch;
+    gap: 7px;
+    padding: 8px;
+    border-radius: 26px;
+  }
+
+  .top-nav-dropdown {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .top-nav-link {
+    width: 100%;
+    min-width: 0;
+    min-height: 48px;
+    padding: 10px 7px;
+    font-size: 0.82rem;
+    gap: 5px;
+  }
+
+  .top-nav-dropdown-toggle {
+    position: relative;
+    min-width: 0;
+    width: 100%;
+    justify-content: center;
+    padding-right: 20px;
+  }
+
+  .top-nav-text {
+    min-width: 0;
+    justify-content: center;
+    gap: 5px;
+  }
+
+  .top-nav-text span:not(.material-icons-outlined),
+  .top-nav-link > span:not(.material-icons-outlined) {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .top-nav-icon {
+    flex: 0 0 auto;
+    font-size: 18px;
+  }
+
+  .top-nav-mini-caret {
+    position: absolute;
+    right: 6px;
+    font-size: 16px;
+  }
+
+  .top-nav-dropdown-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    right: 0;
+    width: max-content;
+    min-width: 190px;
+    max-width: calc(100vw - 32px);
+    transform: none;
+    z-index: 90;
+  }
+
+  .topbar-actions {
+    width: 100%;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  .user-box,
+  .logout-link {
+    width: 100%;
+    min-width: 0;
+    justify-content: center;
+    text-align: center;
+    padding: 10px 12px;
+  }
+
+  .user-box span:last-child,
+  .logout-link span:last-child {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 390px) {
+  .topbar {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .brand-name {
+    font-size: 1.08rem;
+  }
+
+  .brand-subtitle {
+    font-size: 0.78rem;
+  }
+
+  .top-nav {
+    gap: 5px;
+    padding: 7px;
+  }
+
+  .top-nav-link {
+    min-height: 46px;
+    padding: 9px 5px;
+    font-size: 0.76rem;
+  }
+
+  .top-nav-icon {
+    font-size: 17px;
+  }
+
+  .topbar-actions {
+    gap: 8px;
+  }
+
+  .user-box,
+  .logout-link {
+    font-size: 0.78rem;
+    padding: 9px 8px;
+  }
+}
+
+/* =========================================================
+   MENÚ DESPLEGABLE MÓVIL DEL ENCABEZADO
+   Propósito: reemplazar la navegación completa por un botón de menú
+   cuando la pantalla es pequeña, manteniendo el encabezado limpio.
+========================================================= */
+.mobile-menu-toggle,
+.mobile-menu-panel {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .topbar {
+    padding: 12px 14px;
+  }
+
+  .topbar-shell {
+    width: 100%;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 10px 12px;
+  }
+
+  .brand {
+    width: auto;
+    justify-content: flex-start;
+    justify-self: start;
+    gap: 10px;
+    min-width: 0;
+  }
+
+  .brand-logo-frame {
+    width: 48px;
+    height: 48px;
+    border-radius: 15px;
+  }
+
+  .brand-logo {
+    width: 42px;
+    height: 42px;
+  }
+
+  .brand-copy {
+    min-width: 0;
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .brand-name {
+    max-width: 190px;
+    font-size: 1.05rem;
+    line-height: 1.08;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .brand-subtitle {
+    max-width: 190px;
+    font-size: 0.72rem;
+    line-height: 1.15;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .mobile-menu-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 42px;
+    padding: 9px 13px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.10);
+    color: #ffffff;
+    font-size: 0.83rem;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .mobile-menu-toggle .material-icons-outlined {
+    font-size: 20px;
+  }
+
+  .top-nav,
+  .topbar-actions {
+    display: none !important;
+  }
+
+  .mobile-menu-panel {
+    grid-column: 1 / -1;
+    width: 100%;
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px;
+    border-radius: 22px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.07);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  }
+
+  .topbar.mobile-menu-open .mobile-menu-panel {
+    display: flex;
+  }
+
+  .mobile-menu-item,
+  .mobile-menu-group,
+  .mobile-menu-footer {
+    width: 100%;
+  }
+
+  .mobile-menu-item {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 12px;
+    border-radius: 16px;
+    color: rgba(255, 255, 255, 0.92);
+    text-decoration: none;
+    font-weight: 700;
+  }
+
+  .mobile-menu-item.active {
+    background: #ffffff;
+    color: #151515;
+  }
+
+  .mobile-menu-item .material-icons-outlined {
+    font-size: 20px;
+  }
+
+  .mobile-menu-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px;
+    border-radius: 18px;
+    background: rgba(0, 0, 0, 0.18);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .mobile-menu-group-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: rgba(255, 255, 255, 0.78);
+    font-size: 0.78rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .mobile-menu-group-title .material-icons-outlined {
+    font-size: 18px;
+  }
+
+  .mobile-menu-options {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .mobile-menu-chip,
+  .mobile-menu-user,
+  .mobile-menu-logout {
+    min-height: 42px;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 10px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  .mobile-menu-chip.active {
+    background: #ffffff;
+    color: #151515;
+  }
+
+  .mobile-menu-chip .material-icons-outlined,
+  .mobile-menu-user .material-icons-outlined,
+  .mobile-menu-logout .material-icons-outlined {
+    font-size: 18px;
+  }
+
+  .mobile-menu-footer {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 8px;
+  }
+
+  .mobile-menu-user,
+  .mobile-menu-logout {
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .mobile-menu-user span:last-child,
+  .mobile-menu-logout span:last-child {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 390px) {
+  .brand-name,
+  .brand-subtitle {
+    max-width: 150px;
+  }
+
+  .mobile-menu-toggle {
+    padding: 9px 11px;
+  }
+
+  .mobile-menu-options,
+  .mobile-menu-footer {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* =========================================================
+   ENCABEZADO RESPONSIVE ESTABLE
+   Propósito: evitar que el logo, navegación y acciones se amontonen
+   en anchos intermedios; desde tablet/celular se usa un menú desplegable.
+========================================================= */
+@media (max-width: 900px) {
+  .topbar {
+    min-height: auto;
+    padding: 12px 16px;
+    align-items: stretch;
+  }
+
+  .topbar-shell {
+    width: 100%;
+    max-width: 100%;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    justify-content: stretch;
+    gap: 10px 12px;
+  }
+
+  .brand {
+    width: auto;
+    max-width: 100%;
+    justify-content: flex-start;
+    justify-self: start;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+  }
+
+  .brand-logo-frame {
+    width: 48px;
+    height: 48px;
+    border-radius: 15px;
+    flex: 0 0 48px;
+  }
+
+  .brand-logo {
+    width: 42px;
+    height: 42px;
+  }
+
+  .brand-copy {
+    min-width: 0;
+    max-width: min(280px, calc(100vw - 190px));
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .brand-name {
+    max-width: 100%;
+    font-size: 1.02rem;
+    line-height: 1.08;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .brand-subtitle {
+    max-width: 100%;
+    font-size: 0.72rem;
+    line-height: 1.15;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .mobile-menu-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    justify-self: end;
+    gap: 6px;
+    min-height: 42px;
+    padding: 9px 14px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.10);
+    color: #ffffff;
+    font-size: 0.84rem;
+    font-weight: 800;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .mobile-menu-toggle .material-icons-outlined {
+    font-size: 20px;
+  }
+
+  .top-nav,
+  .topbar-actions {
+    display: none !important;
+  }
+
+  .mobile-menu-panel {
+    grid-column: 1 / -1;
+    width: 100%;
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px;
+    border-radius: 22px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.07);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  }
+
+  .topbar.mobile-menu-open .mobile-menu-panel {
+    display: flex;
+  }
+
+  .mobile-menu-item,
+  .mobile-menu-group,
+  .mobile-menu-footer {
+    width: 100%;
+  }
+
+  .mobile-menu-item {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 12px;
+    border-radius: 16px;
+    color: rgba(255, 255, 255, 0.92);
+    text-decoration: none;
+    font-weight: 800;
+  }
+
+  .mobile-menu-item.active {
+    background: #ffffff;
+    color: #151515;
+  }
+
+  .mobile-menu-item .material-icons-outlined {
+    font-size: 20px;
+  }
+
+  .mobile-menu-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px;
+    border-radius: 18px;
+    background: rgba(0, 0, 0, 0.18);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .mobile-menu-group-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: rgba(255, 255, 255, 0.78);
+    font-size: 0.78rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .mobile-menu-group-title .material-icons-outlined {
+    font-size: 18px;
+  }
+
+  .mobile-menu-options {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .mobile-menu-chip,
+  .mobile-menu-user,
+  .mobile-menu-logout {
+    min-height: 42px;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 10px;
+    font-size: 0.82rem;
+    font-weight: 800;
+    cursor: pointer;
+    text-decoration: none;
+    min-width: 0;
+  }
+
+  .mobile-menu-chip.active {
+    background: #ffffff;
+    color: #151515;
+  }
+
+  .mobile-menu-chip .material-icons-outlined,
+  .mobile-menu-user .material-icons-outlined,
+  .mobile-menu-logout .material-icons-outlined {
+    font-size: 18px;
+  }
+
+  .mobile-menu-footer {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 8px;
+  }
+
+  .mobile-menu-user span:last-child,
+  .mobile-menu-logout span:last-child {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+/* Propósito: compactar aún más el encabezado en pantallas muy angostas. */
+@media (max-width: 430px) {
+  .topbar {
+    padding: 10px 12px;
+  }
+
+  .brand-logo-frame {
+    width: 44px;
+    height: 44px;
+    flex-basis: 44px;
+  }
+
+  .brand-logo {
+    width: 39px;
+    height: 39px;
+  }
+
+  .brand-copy {
+    max-width: calc(100vw - 170px);
+  }
+
+  .brand-name {
+    font-size: 0.98rem;
+  }
+
+  .brand-subtitle {
+    font-size: 0.68rem;
+  }
+
+  .mobile-menu-toggle {
+    padding: 9px 11px;
+    font-size: 0.8rem;
+  }
+}
+
+/* Propósito: evitar doble columna en el menú cuando el espacio ya no alcanza. */
+@media (max-width: 360px) {
+  .mobile-menu-toggle span:last-child {
+    display: none;
+  }
+
+  .mobile-menu-options,
+  .mobile-menu-footer {
+    grid-template-columns: 1fr;
+  }
+}

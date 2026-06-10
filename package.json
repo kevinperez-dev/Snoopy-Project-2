@@ -1,0 +1,21 @@
+{
+  "name": "snoopy-project-2",
+  "version": "1.0.0",
+  "description": "Snoopy Project 2 con frontend React, backend Express y PostgreSQL",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently -n BACKEND,FRONTEND -c blue,green \"npm --prefix snoopy-project-2-backend run dev\" \"npm --prefix snoopy-project-2-frontend run dev\"",
+    "backend": "npm --prefix snoopy-project-2-backend run dev",
+    "frontend": "npm --prefix snoopy-project-2-frontend run dev",
+    "backend:start": "npm --prefix snoopy-project-2-backend start",
+    "frontend:build": "npm --prefix snoopy-project-2-frontend run build",
+    "format": "prettier . --write"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "prettier": "3.6.2"
+  },
+  "dependencies": {
+    "cors": "^2.8.6"
+  }
+}

@@ -1,0 +1,11 @@
+/* Estilos globales para toda la aplicación */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Inter, Arial, sans-serif;
+  background: #f4f6f9;
+  color: #1f2937;
+}
