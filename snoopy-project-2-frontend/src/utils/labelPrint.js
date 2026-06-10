@@ -291,7 +291,7 @@ function buildPrintableLabelHtml(record) {
             <div class="label-top">
               <div class="label-brand">
                 <div>
-                  <h3>Snoopy Project 2</h3>
+                  <h3>Oficinas TJ</h3>
                 </div>
               </div>
             </div>

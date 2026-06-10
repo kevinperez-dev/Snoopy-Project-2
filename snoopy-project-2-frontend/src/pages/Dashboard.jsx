@@ -556,7 +556,7 @@ Detalle: Zoto / Ramón`}
                   <div className="thermal-label-top">
                     <div className="thermal-label-brand">
                       <div>
-                        <h3>Snoopy Project 2</h3>
+                        <h3>Oficinas TJ</h3>
                       </div>
                     </div>
                   </div>
