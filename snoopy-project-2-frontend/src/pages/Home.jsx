@@ -421,12 +421,13 @@ function buildXlsxSheetXml({ weekText, cashRows, totals }) {
     rows.push(createXlsxRow(1, [{ column: 0, value: 'Control semanal', styleId: 1 }], 28));
     rows.push(createXlsxRow(2, [
         { column: 0, value: 'Registros mostrados', styleId: 3 },
-        { column: 7, value: weekText, styleId: 2 }
+        { column: 8, value: weekText, styleId: 2 }
     ], 24));
 
     const headers = [
         'Fecha',
         'Folio',
+        'Nombre',
         'Descripción',
         'Ingreso dólares',
         'Ingreso pesos',
@@ -437,9 +438,9 @@ function buildXlsxSheetXml({ weekText, cashRows, totals }) {
     ];
 
     rows.push(createXlsxRow(3, headers.map((header, index) => {
-        const styleId = [3, 5, 7].includes(index)
+        const styleId = [4, 6, 8].includes(index)
             ? 7
-            : [4, 6, 8].includes(index)
+            : [5, 7, 9].includes(index)
                 ? 8
                 : 4;
 
@@ -455,6 +456,7 @@ function buildXlsxSheetXml({ weekText, cashRows, totals }) {
         const values = [
             formatShortDate(row.fecha) || '',
             row.folio || '',
+            row.nombre || '',
             row.descripcion || '',
             createXlsxMoneyValue(row.ingresoDolares, { blankWhenZero: true }),
             createXlsxMoneyValue(row.ingresoPesos, { blankWhenZero: true }),
@@ -465,9 +467,9 @@ function buildXlsxSheetXml({ weekText, cashRows, totals }) {
         ];
 
         rows.push(createXlsxRow(currentRow, values.map((value, column) => {
-            const styleId = [3, 5, 7].includes(column)
+            const styleId = [4, 6, 8].includes(column)
                 ? 9
-                : [4, 6, 8].includes(column)
+                : [5, 7, 9].includes(column)
                     ? 10
                     : 5;
 
@@ -483,6 +485,7 @@ function buildXlsxSheetXml({ weekText, cashRows, totals }) {
     const totalValues = [
         '',
         '',
+        '',
         'Totales de la semana',
         createXlsxMoneyValue(totals.totalIngresosDolares),
         createXlsxMoneyValue(totals.totalIngresosPesos),
@@ -493,9 +496,9 @@ function buildXlsxSheetXml({ weekText, cashRows, totals }) {
     ];
 
     rows.push(createXlsxRow(totalRowIndex, totalValues.map((value, column) => {
-        const styleId = [3, 5, 7].includes(column)
+        const styleId = [4, 6, 8].includes(column)
             ? 11
-            : [4, 6, 8].includes(column)
+            : [5, 7, 9].includes(column)
                 ? 12
                 : 6;
 
@@ -513,18 +516,19 @@ function buildXlsxSheetXml({ weekText, cashRows, totals }) {
   <cols>
     <col min="1" max="1" width="13" customWidth="1"/>
     <col min="2" max="2" width="15" customWidth="1"/>
-    <col min="3" max="3" width="26" customWidth="1"/>
-    <col min="4" max="9" width="15" customWidth="1"/>
-    <col min="10" max="10" width="3" customWidth="1"/>
-    <col min="11" max="17" width="12" customWidth="1"/>
+    <col min="3" max="3" width="22" customWidth="1"/>
+    <col min="4" max="4" width="28" customWidth="1"/>
+    <col min="5" max="10" width="15" customWidth="1"/>
+    <col min="11" max="11" width="3" customWidth="1"/>
+    <col min="12" max="18" width="12" customWidth="1"/>
   </cols>
   <sheetData>
     ${rows.join('\n    ')}
   </sheetData>
   <mergeCells count="3">
-    <mergeCell ref="A1:I1"/>
-    <mergeCell ref="A2:G2"/>
-    <mergeCell ref="H2:I2"/>
+    <mergeCell ref="A1:J1"/>
+    <mergeCell ref="A2:H2"/>
+    <mergeCell ref="I2:J2"/>
   </mergeCells>
   <drawing r:id="rId1"/>
 </worksheet>`;
@@ -539,7 +543,7 @@ function buildDrawingXml(width, height) {
 <xdr:wsDr xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
   <xdr:oneCellAnchor editAs="oneCell">
     <xdr:from>
-      <xdr:col>10</xdr:col>
+      <xdr:col>11</xdr:col>
       <xdr:colOff>0</xdr:colOff>
       <xdr:row>1</xdr:row>
       <xdr:rowOff>0</xdr:rowOff>
@@ -906,6 +910,7 @@ function Home() {
             id: 'saldo-inicial',
             fecha: '',
             folio: '',
+            nombre: '',
             descripcion: 'Inicio de semana',
             ingresoPesos: null,
             ingresoDolares: null,
@@ -939,7 +944,8 @@ function Home() {
                     id: record.id,
                     fecha: record.fecha,
                     folio: record.folio,
-                    descripcion: record.descripcion || record.nombre,
+                    nombre: record.nombre || '',
+                    descripcion: record.descripcion || '',
                     ingresoPesos,
                     ingresoDolares,
                     egresoPesos,
@@ -1316,6 +1322,7 @@ function Home() {
                                     <tr>
                                         <th rowSpan="2">Fecha</th>
                                         <th rowSpan="2">Folio</th>
+                                        <th rowSpan="2">Nombre</th>
                                         <th rowSpan="2">Descripción</th>
                                         <th colSpan="2" className="home-th-income">Ingreso</th>
                                         <th colSpan="2" className="home-th-expense">Egreso</th>
@@ -1334,13 +1341,13 @@ function Home() {
                                 <tbody>
                                     {isLoading ? (
                                         <tr>
-                                            <td colSpan="9" className="home-empty-row">
+                                            <td colSpan="10" className="home-empty-row">
                                                 Cargando movimientos...
                                             </td>
                                         </tr>
                                     ) : apiError ? (
                                         <tr>
-                                            <td colSpan="9" className="home-empty-row">
+                                            <td colSpan="10" className="home-empty-row">
                                                 {apiError}
                                             </td>
                                         </tr>
@@ -1350,6 +1357,7 @@ function Home() {
                                                 <tr key={row.id} className="home-row-initial">
                                                     <td>{formatShortDate(row.fecha)}</td>
                                                     <td>{row.folio}</td>
+                                                    <td>{row.nombre}</td>
                                                     <td>{row.descripcion}</td>
                                                     <td>--</td>
                                                     <td>--</td>
@@ -1361,7 +1369,7 @@ function Home() {
                                             ))}
 
                                             <tr>
-                                                <td colSpan="9" className="home-empty-row">
+                                                <td colSpan="10" className="home-empty-row">
                                                     No hay ingresos ni egresos registrados en esta semana.
                                                 </td>
                                             </tr>
@@ -1380,6 +1388,7 @@ function Home() {
                                             >
                                                 <td>{formatShortDate(row.fecha)}</td>
                                                 <td>{row.folio}</td>
+                                                <td>{row.nombre}</td>
                                                 <td>{row.descripcion}</td>
                                                 <td>{renderMovementAmount(row.ingresoDolares, 'dolares')}</td>
                                                 <td>{renderMovementAmount(row.ingresoPesos, 'pesos')}</td>
@@ -1394,7 +1403,7 @@ function Home() {
 
                                 <tfoot>
                                     <tr>
-                                        <td colSpan="3">Totales de la semana</td>
+                                        <td colSpan="4">Totales de la semana</td>
                                         <td>{renderCurrencyAmount(totals.totalIngresosDolares, 'dolares')}</td>
                                         <td>{renderCurrencyAmount(totals.totalIngresosPesos, 'pesos')}</td>
                                         <td>{renderCurrencyAmount(totals.totalEgresosDolares, 'dolares')}</td>

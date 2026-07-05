@@ -5,7 +5,6 @@ import Header from '../components/Header.jsx';
 import Toast from '../components/ui/Toast.jsx';
 import { getCurrentISOWeek, getISOWeekInfo, getMaxAllowedWeekForYear, getTodayISO, getWeekLabel, formatShortDate } from '../utils/dates.js';
 import { exportRowsToExcelXml } from '../utils/excel.js';
-import { generateAutoFolio } from '../utils/folio.js';
 import { printMovementLabel } from '../utils/labelPrint.js';
 import {
   CURRENCY_OPTIONS,
@@ -130,10 +129,6 @@ function Dashboard() {
   const previewInfo = getISOWeekInfo(form.fecha || getTodayISO());
   const previewConcept = formatStructuredConcept(form.descripcion);
 
-  // Folio automático calculado con los movimientos existentes en PostgreSQL.
-  const folio = useMemo(() => {
-    return generateAutoFolio(form.fecha, records);
-  }, [form.fecha, records]);
 
   // Periodos visibles: año actual y anterior, igual que el proyecto original.
   const years = useMemo(() => {
@@ -295,7 +290,6 @@ function Dashboard() {
   const saveMovement = async () => {
     if (
       !form.fecha ||
-      !folio ||
       !form.nombre.trim() ||
       !form.descripcion.trim() ||
       Number(form.cantidad) <= 0 ||
@@ -312,7 +306,6 @@ function Dashboard() {
     const newRecord = {
       tipo: type,
       fecha: form.fecha,
-      folio,
       nombre: form.nombre.trim(),
       descripcion: form.descripcion.trim(),
       cantidad: Number(form.cantidad),
@@ -335,7 +328,7 @@ function Dashboard() {
 
       setToast({
         title: `${type === 'ingreso' ? 'Ingreso' : 'Egreso'} guardado exitosamente`,
-        text: 'Movimiento guardado.',
+        text: `Movimiento guardado con folio ${savedRecord.folio}.`,
         type: 'success'
       });
 
@@ -451,7 +444,7 @@ function Dashboard() {
 
                 <div className="form-group">
                   <label htmlFor="folio">Folio</label>
-                  <input type="text" id="folio" value={folio} readOnly />
+                  <input type="text" id="folio" value="" readOnly />
                 </div>
 
                 <div className="form-group">
@@ -563,7 +556,7 @@ Detalle: Zoto / Ramón`}
 
                   <div className="thermal-label-body">
                     <div className="thermal-label-line">
-                      <strong>Folio:</strong> <span>{folio || '00000000'}</span>
+                      <strong>Folio:</strong> <span>&nbsp;</span>
                     </div>
 
                     <div className="thermal-label-line">

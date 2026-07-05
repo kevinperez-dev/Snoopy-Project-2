@@ -85,7 +85,8 @@ function fieldWasChanged(previousValue, newValue) {
 }
 
 // Propósito: validar los datos de un movimiento antes de guardar o actualizar.
-function validateMovementPayload(payload) {
+function validateMovementPayload(payload, options = {}) {
+  const { requireFolio = true } = options;
   const tipo = String(payload.tipo || '').trim();
   const fecha = normalizeDateForDatabase(payload.fecha);
   const folio = String(payload.folio || '').trim();
@@ -94,7 +95,7 @@ function validateMovementPayload(payload) {
   const cantidad = Number(payload.cantidad);
   const moneda = normalizeCurrency(payload.moneda);
 
-  if (!tipo || !fecha || !folio || !nombre || !descripcion || !payload.cantidad || !moneda) {
+  if (!tipo || !fecha || (requireFolio && !folio) || !nombre || !descripcion || !payload.cantidad || !moneda) {
     return {
       hasError: true,
       message: 'Todos los campos son obligatorios.',
@@ -134,6 +135,43 @@ function validateMovementPayload(payload) {
       moneda,
     },
   };
+}
+
+
+// Propósito: obtener el prefijo del folio con formato YYMMDD a partir de la fecha del movimiento.
+function getFolioPrefixFromDate(fecha) {
+  const [year, month, day] = String(fecha || '').split('-');
+
+  return `${year.slice(-2)}${month}${day}`;
+}
+
+// Propósito: generar el siguiente folio disponible usando el prefijo YYMMDD,
+// sin depender de la fecha actual guardada en el movimiento.
+async function generateNextFolio(client, fecha) {
+  const prefix = getFolioPrefixFromDate(fecha);
+
+  // Propósito: bloquear la generación por prefijo para evitar que dos usuarios
+  // creen el mismo folio al guardar casi al mismo tiempo.
+  await client.query(
+    'SELECT pg_advisory_xact_lock(hashtext($1))',
+    [`movement-folio:${prefix}`],
+  );
+
+  // Propósito: buscar el folio más alto ya usado con ese prefijo,
+  // aunque el movimiento haya sido editado y ahora tenga otra fecha.
+  const result = await client.query(
+    `
+    SELECT COALESCE(MAX(CAST(SUBSTRING(folio FROM 7) AS INTEGER)), 0) AS max_sequence
+    FROM movements
+    WHERE folio ~ $1
+    `,
+    [`^${prefix}[0-9]+$`],
+  );
+
+  const nextSequence = Number(result.rows[0]?.max_sequence || 0) + 1;
+
+  // Propósito: regresar el folio con formato YYMMDD + consecutivo de 2 dígitos.
+  return `${prefix}${String(nextSequence).padStart(2, '0')}`;
 }
 
 // Propósito: validar que el parámetro id sea numérico antes de consultar PostgreSQL.
@@ -320,10 +358,12 @@ async function getMovementEditHistory(req, res) {
   return undefined;
 }
 
-// Propósito: crear un nuevo movimiento.
+// Propósito: crear un nuevo movimiento generando el folio exactamente al guardar.
 async function createMovement(req, res) {
+  const client = await pool.connect();
+
   try {
-    const validation = validateMovementPayload(req.body);
+    const validation = validateMovementPayload(req.body, { requireFolio: false });
 
     if (validation.hasError) {
       return res.status(400).json({
@@ -331,9 +371,13 @@ async function createMovement(req, res) {
       });
     }
 
-    const { tipo, fecha, folio, nombre, descripcion, cantidad, moneda } = validation.data;
+    const { tipo, fecha, nombre, descripcion, cantidad, moneda } = validation.data;
 
-    const result = await pool.query(
+    await client.query('BEGIN');
+
+    const folio = await generateNextFolio(client, fecha);
+
+    const result = await client.query(
       `
       INSERT INTO movements (
         tipo,
@@ -351,15 +395,18 @@ async function createMovement(req, res) {
       [tipo, fecha, folio, nombre, descripcion, cantidad, moneda, req.user.id],
     );
 
+    await client.query('COMMIT');
+
     const movement = await getMovementWithLatestEditById(result.rows[0].id);
 
-    res.status(201).json(movement);
+    return res.status(201).json(movement);
   } catch (error) {
+    await client.query('ROLLBACK').catch(() => undefined);
     console.error('Error al crear movimiento:', error);
 
     if (error.code === '23505') {
       return res.status(409).json({
-        message: 'El folio ya existe.',
+        message: 'El folio ya existe. Intenta guardar nuevamente.',
       });
     }
 
@@ -369,9 +416,11 @@ async function createMovement(req, res) {
       });
     }
 
-    res.status(500).json({
+    return res.status(500).json({
       message: 'Error al crear movimiento.',
     });
+  } finally {
+    client.release();
   }
 }
 
@@ -383,7 +432,7 @@ async function updateMovement(req, res) {
     const id = getValidMovementId(req, res);
     if (!id) return undefined;
 
-    const validation = validateMovementPayload(req.body);
+    const validation = validateMovementPayload(req.body, { requireFolio: false });
 
     if (validation.hasError) {
       return res.status(400).json({
@@ -391,7 +440,8 @@ async function updateMovement(req, res) {
       });
     }
 
-    const { tipo, fecha, folio, nombre, descripcion, cantidad, moneda } = validation.data;
+    // Propósito: tomar solo los campos editables; el folio se conserva como identificador original.
+    const { tipo, fecha, nombre, descripcion, cantidad, moneda } = validation.data;
     const comentario = String(req.body.comentario || '').trim();
 
     await client.query('BEGIN');
@@ -423,6 +473,9 @@ async function updateMovement(req, res) {
       });
     }
 
+    // Propósito: conservar siempre el folio original, aunque el frontend o una petición manual mande otro valor.
+    const folio = currentMovement.folio;
+
     const previousAmount = Number(currentMovement.cantidad);
     const newAmount = Number(cantidad);
     const previousCurrency = normalizeCurrency(currentMovement.moneda);
@@ -432,7 +485,8 @@ async function updateMovement(req, res) {
 
     const typeWasAdjusted = fieldWasChanged(currentMovement.tipo, tipo);
     const dateWasAdjusted = fieldWasChanged(previousDate, newDate);
-    const folioWasAdjusted = fieldWasChanged(currentMovement.folio, folio);
+    // Propósito: el folio no se considera editable; solo cambia fecha, tipo, nombre, descripción, cantidad o moneda.
+    const folioWasAdjusted = false;
     const nameWasAdjusted = fieldWasChanged(currentMovement.nombre, nombre);
     const descriptionWasAdjusted = fieldWasChanged(currentMovement.descripcion, descripcion);
     const amountWasAdjusted = previousAmount !== newAmount;
