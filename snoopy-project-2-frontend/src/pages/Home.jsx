@@ -5,9 +5,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import Header from '../components/Header.jsx';
-import CashBoxSelector from '../components/CashBoxSelector.jsx';
-import SelectDropdown from '../components/SelectDropdown.jsx';
-import { useCashBoxes } from '../hooks/useCashBoxes.js';
 import { getMovements } from '../services/movementsApi.js';
 import { getCurrentISOWeek, getISOWeekInfo, getISOWeekStart, getMaxAllowedWeekForYear, getWeekLabel, formatShortDate } from '../utils/dates.js';
 import { getCurrencyBucket, renderCurrencyAmount } from '../utils/money.js';
@@ -15,20 +12,14 @@ import { isAuthenticated } from '../utils/session.js';
 
 
 // Propósito: cargar el saldo inicial guardado por semana y moneda.
-function getStoredBalances(year, weekNumber, cashBoxId = '1') {
+function getStoredBalances(year, weekNumber) {
     const oldSingleBalanceKey = `snoopyProject2SaldoInicial_${year}_${weekNumber}`;
-    const pesosKey = `snoopyProject2SaldoInicialPesos_${cashBoxId}_${year}_${weekNumber}`;
-    const dollarsKey = `snoopyProject2SaldoInicialDolares_${cashBoxId}_${year}_${weekNumber}`;
-    const legacyPesosKey = `snoopyProject2SaldoInicialPesos_${year}_${weekNumber}`;
-    const legacyDollarsKey = `snoopyProject2SaldoInicialDolares_${year}_${weekNumber}`;
+    const pesosKey = `snoopyProject2SaldoInicialPesos_${year}_${weekNumber}`;
+    const dollarsKey = `snoopyProject2SaldoInicialDolares_${year}_${weekNumber}`;
 
     return {
-        pesos: localStorage.getItem(pesosKey) ?? (String(cashBoxId) === '1'
-            ? localStorage.getItem(legacyPesosKey) ?? localStorage.getItem(oldSingleBalanceKey)
-            : null) ?? '0',
-        dolares: localStorage.getItem(dollarsKey) ?? (String(cashBoxId) === '1'
-            ? localStorage.getItem(legacyDollarsKey)
-            : null) ?? '0'
+        pesos: localStorage.getItem(pesosKey) ?? localStorage.getItem(oldSingleBalanceKey) ?? '0',
+        dolares: localStorage.getItem(dollarsKey) ?? '0'
     };
 }
 
@@ -36,6 +27,7 @@ function getStoredBalances(year, weekNumber, cashBoxId = '1') {
 function getWeekStartTime(year, weekNumber) {
     return getISOWeekStart(Number(year), Number(weekNumber)).getTime();
 }
+
 
 // Propósito: escapar caracteres especiales para generar XML compatible con Excel.
 function escapeExcelXml(value) {
@@ -698,7 +690,6 @@ async function downloadExcelWithSummaryImage({ fileName, sheetName, weekText, su
 
 function Home() {
     const navigate = useNavigate();
-    const { activeCashBoxId } = useCashBoxes();
 
     // Movimientos cargados desde PostgreSQL
     const [records, setRecords] = useState([]);
@@ -714,7 +705,7 @@ function Home() {
 
     // Saldo inicial temporal por semana y moneda
     // Después se puede guardar en PostgreSQL con una tabla weekly_balances
-    const initialStoredBalances = getStoredBalances(currentWeek.year, currentWeek.week, activeCashBoxId);
+    const initialStoredBalances = getStoredBalances(currentWeek.year, currentWeek.week);
     const [manualStartingBalancePesos, setManualStartingBalancePesos] = useState(initialStoredBalances.pesos);
     const [manualStartingBalanceDolares, setManualStartingBalanceDolares] = useState(initialStoredBalances.dolares);
 
@@ -774,19 +765,10 @@ function Home() {
 
     // Carga el saldo inicial manual correspondiente cuando cambia el periodo o la semana.
     const loadStartingBalances = useCallback((year, weekNumber) => {
-        const storedBalances = getStoredBalances(year, weekNumber, activeCashBoxId);
+        const storedBalances = getStoredBalances(year, weekNumber);
         setManualStartingBalancePesos(storedBalances.pesos);
         setManualStartingBalanceDolares(storedBalances.dolares);
-    }, [activeCashBoxId]);
-
-    // Propósito: cargar los saldos manuales propios de la caja recién seleccionada.
-    useEffect(() => {
-        if (!activeCashBoxId) return;
-
-        // Sincroniza los saldos locales cuando cambia la caja seleccionada.
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        loadStartingBalances(period, selectedWeek);
-    }, [activeCashBoxId, loadStartingBalances, period, selectedWeek]);
+    }, []);
 
     // Movimientos activos que sí participan en saldos.
     const activeRecords = useMemo(() => {
@@ -826,7 +808,7 @@ function Home() {
             .sort((a, b) => a.start - b.start);
 
         const baseWeekInfo = sortedWeekStarts[0];
-        const baseBalances = getStoredBalances(baseWeekInfo.year, baseWeekInfo.week, activeCashBoxId);
+        const baseBalances = getStoredBalances(baseWeekInfo.year, baseWeekInfo.week);
 
         const carriedBalances = relevantRecords.reduce(
             (accumulator, record) => {
@@ -863,7 +845,6 @@ function Home() {
         };
     }, [
         activeRecords,
-        activeCashBoxId,
         period,
         selectedWeek,
         manualStartingBalancePesos,
@@ -1050,12 +1031,7 @@ function Home() {
                 setIsLoading(true);
                 setApiError('');
 
-                if (!activeCashBoxId) {
-                    setRecords([]);
-                    return;
-                }
-
-                const data = await getMovements(activeCashBoxId);
+                const data = await getMovements();
                 setRecords(data);
 
                 // Si la semana actual no tiene datos, muestra automáticamente la última semana con movimientos.
@@ -1085,7 +1061,7 @@ function Home() {
         }
 
         loadHomeData();
-    }, [navigate, currentWeek.year, currentWeek.week, loadStartingBalances, activeCashBoxId]);
+    }, [navigate, currentWeek.year, currentWeek.week, loadStartingBalances]);
 
     // Estilos globales para esta vista
     useEffect(() => {
@@ -1103,12 +1079,12 @@ function Home() {
         if (computedInitialBalances.isAutomatic) return;
 
         localStorage.setItem(
-            `snoopyProject2SaldoInicialPesos_${activeCashBoxId}_${period}_${selectedWeek}`,
+            `snoopyProject2SaldoInicialPesos_${period}_${selectedWeek}`,
             manualStartingBalancePesos || '0'
         );
 
         localStorage.setItem(
-            `snoopyProject2SaldoInicialDolares_${activeCashBoxId}_${period}_${selectedWeek}`,
+            `snoopyProject2SaldoInicialDolares_${period}_${selectedWeek}`,
             manualStartingBalanceDolares || '0'
         );
     }, [
@@ -1116,8 +1092,7 @@ function Home() {
         selectedWeek,
         manualStartingBalancePesos,
         manualStartingBalanceDolares,
-        computedInitialBalances.isAutomatic,
-        activeCashBoxId
+        computedInitialBalances.isAutomatic
     ]);
 
     // Propósito: exportar a Excel los registros visibles con el resumen insertado como imagen.
@@ -1170,9 +1145,8 @@ function Home() {
                 <section className="page-header screenshot-style-header">
                     <div>
                         <h1>Inicio</h1>
-                        <p>Control semanal de la caja seleccionada, ingresos, egresos e importe por moneda.</p>
+                        <p>Control semanal tipo Excel de caja chica, ingresos, egresos e importe que quedó en caja por moneda.</p>
                     </div>
-                    <CashBoxSelector label="Caja" className="home-page-cash-box-selector" />
                 </section>
 
                 <section className="home-summary-grid">
@@ -1246,10 +1220,10 @@ function Home() {
                         <div className="home-filters-row home-control-fields-grid">
                             <div className="filter-box home-filter-card">
                                 <label htmlFor="homePeriodo">Periodo</label>
-                                <SelectDropdown
+                                <select
                                     id="homePeriodo"
+                                    className="filter-control"
                                     value={period}
-                                    options={years.map((year) => ({ value: year, label: year }))}
                                     onChange={(event) => {
                                         const nextYear = event.target.value;
                                         const maxWeek = getMaxAllowedWeekForYear(Number(nextYear), records);
@@ -1258,24 +1232,31 @@ function Home() {
                                         setWeek(String(maxWeek));
                                         loadStartingBalances(nextYear, maxWeek);
                                     }}
-                                />
+                                >
+                                    {years.map((year) => (
+                                        <option key={year} value={year}>{year}</option>
+                                    ))}
+                                </select>
                             </div>
 
                             <div className="filter-box home-filter-card home-week-card">
                                 <label htmlFor="homeSemana">Semana</label>
-                                <SelectDropdown
+                                <select
                                     id="homeSemana"
+                                    className="filter-control"
                                     value={selectedWeek}
-                                    options={weeks.map((itemWeek) => ({
-                                        value: itemWeek,
-                                        label: getWeekLabel(Number(period), itemWeek),
-                                    }))}
                                     onChange={(event) => {
                                         const nextWeek = event.target.value;
                                         setWeek(nextWeek);
                                         loadStartingBalances(period, nextWeek);
                                     }}
-                                />
+                                >
+                                    {weeks.map((itemWeek) => (
+                                        <option key={itemWeek} value={itemWeek}>
+                                            {getWeekLabel(Number(period), itemWeek)}
+                                        </option>
+                                    ))}
+                                </select>
                             </div>
 
                             <div className="filter-box home-filter-card home-money-card">

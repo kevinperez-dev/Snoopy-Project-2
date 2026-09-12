@@ -2,8 +2,8 @@
 // Propósito: header general reutilizable con submenús para Movimientos y Reportes.
 
 import { Link, useNavigate } from 'react-router-dom';
-import { useEffect, useRef, useState } from 'react';
-import { getCurrentRole, getCurrentUser, logoutSession } from '../utils/session.js';
+import { useState } from 'react';
+import { getCurrentUser, logoutSession } from '../utils/session.js';
 
 function Header({
     activePage = '',
@@ -16,35 +16,6 @@ function Header({
     const [isMovementsMenuOpen, setIsMovementsMenuOpen] = useState(false);
     const [isReportsMenuOpen, setIsReportsMenuOpen] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-    const topbarShellRef = useRef(null);
-    const isAdmin = getCurrentRole() === 'admin';
-
-    // Propósito: cerrar los menús abiertos cuando el usuario hace clic fuera del encabezado.
-    useEffect(() => {
-        const closeMenusWhenClickingOutside = (event) => {
-            if (!topbarShellRef.current?.contains(event.target)) {
-                setIsMovementsMenuOpen(false);
-                setIsReportsMenuOpen(false);
-                setIsMobileMenuOpen(false);
-            }
-        };
-
-        const closeMenusWithEscape = (event) => {
-            if (event.key === 'Escape') {
-                setIsMovementsMenuOpen(false);
-                setIsReportsMenuOpen(false);
-                setIsMobileMenuOpen(false);
-            }
-        };
-
-        document.addEventListener('mousedown', closeMenusWhenClickingOutside);
-        document.addEventListener('keydown', closeMenusWithEscape);
-
-        return () => {
-            document.removeEventListener('mousedown', closeMenusWhenClickingOutside);
-            document.removeEventListener('keydown', closeMenusWithEscape);
-        };
-    }, []);
 
     // Cierra sesión y regresa al login.
     const handleLogout = (event) => {
@@ -120,7 +91,7 @@ function Header({
 
     return (
         <header className={`topbar ${isMobileMenuOpen ? 'mobile-menu-open' : ''}`}>
-            <div className="topbar-shell" ref={topbarShellRef}>
+            <div className="topbar-shell">
                 <Link to="/inicio" className="brand" aria-label="Ir a Inicio">
                     <span className="brand-logo-frame">
                         <img src="/snoopy-laptop-removebg-preview.png" alt="Logo Snoopy Project 2" className="brand-logo" />
@@ -228,16 +199,6 @@ function Header({
                             </button>
                         </div>
                     </div>
-
-                    {isAdmin && (
-                        <Link
-                            to="/configuracion/cajas"
-                            className={`top-nav-link ${activePage === 'configuracion' ? 'active' : ''}`}
-                        >
-                            <span className="material-icons-outlined top-nav-icon">tune</span>
-                            <span>Configuración</span>
-                        </Link>
-                    )}
                 </nav>
 
                 <div className="topbar-actions">
@@ -326,13 +287,6 @@ function Header({
                     </div>
 
                     <div className="mobile-menu-footer">
-                        {isAdmin && (
-                            <Link to="/configuracion/cajas" className="mobile-menu-logout" onClick={closeMobileMenu}>
-                                <span className="material-icons-outlined">tune</span>
-                                <span>Configuración</span>
-                            </Link>
-                        )}
-
                         <div className="mobile-menu-user" title="Usuario activo">
                             <span className="material-icons-outlined">person</span>
                             <span>{getCurrentUser()}</span>

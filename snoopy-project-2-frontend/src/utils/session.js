@@ -51,7 +51,6 @@ export function setLoginSession(user, token = '', role = '') {
   localStorage.setItem(STORAGE_KEYS.token, token || '');
   localStorage.setItem(STORAGE_KEYS.role, role || '');
   markSessionActivity();
-  window.dispatchEvent(new Event('snoopy-auth-changed'));
 }
 
 // Propósito: obtener el token actual para peticiones protegidas al backend.
@@ -70,9 +69,4 @@ export function logoutSession() {
     localStorage.removeItem(key);
     sessionStorage.removeItem(key);
   });
-  window.dispatchEvent(new Event('snoopy-auth-changed'));
-}
-
-export function getCurrentRole() {
-  return localStorage.getItem(STORAGE_KEYS.role) || '';
 }

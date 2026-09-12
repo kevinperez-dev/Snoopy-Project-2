@@ -5,7 +5,6 @@ const pool = require('../config/db');
 
 // Tipos válidos que acepta la tabla movements.
 const VALID_TYPES = ['ingreso', 'egreso', 'cancelado'];
-const VALID_MOVEMENT_TYPES = ['ingreso', 'egreso'];
 
 // Monedas válidas que acepta la tabla movements.
 const VALID_CURRENCIES = ['Pesos', 'Dólares', 'Dolares'];
@@ -80,24 +79,6 @@ function normalizeDateForCompare(value) {
   return normalizeDateForDatabase(value);
 }
 
-// Propósito: comprobar que la fecha exista realmente en el calendario y no solo tenga formato ISO.
-function isValidCalendarDate(value) {
-  const match = String(value || '').match(/^(\d{4})-(\d{2})-(\d{2})$/);
-
-  if (!match) return false;
-
-  const year = Number(match[1]);
-  const month = Number(match[2]);
-  const day = Number(match[3]);
-  const date = new Date(Date.UTC(year, month - 1, day));
-
-  return (
-    date.getUTCFullYear() === year &&
-    date.getUTCMonth() === month - 1 &&
-    date.getUTCDate() === day
-  );
-}
-
 // Propósito: detectar si un campo de texto o fecha cambió durante una edición.
 function fieldWasChanged(previousValue, newValue) {
   return normalizeTextForCompare(previousValue) !== normalizeTextForCompare(newValue);
@@ -114,33 +95,17 @@ function validateMovementPayload(payload, options = {}) {
   const cantidad = Number(payload.cantidad);
   const moneda = normalizeCurrency(payload.moneda);
 
-  if (!tipo || !fecha || (requireFolio && !folio) || !nombre || !descripcion ||
-      payload.cantidad === undefined || payload.cantidad === null ||
-      String(payload.cantidad).trim() === '' || !moneda) {
+  if (!tipo || !fecha || (requireFolio && !folio) || !nombre || !descripcion || !payload.cantidad || !moneda) {
     return {
       hasError: true,
       message: 'Todos los campos son obligatorios.',
     };
   }
 
-  if (!VALID_MOVEMENT_TYPES.includes(tipo)) {
+  if (!VALID_TYPES.includes(tipo)) {
     return {
       hasError: true,
       message: 'El tipo de movimiento no es válido.',
-    };
-  }
-
-  if (!isValidCalendarDate(fecha)) {
-    return {
-      hasError: true,
-      message: 'La fecha del movimiento no es válida.',
-    };
-  }
-
-  if (nombre.length > 150) {
-    return {
-      hasError: true,
-      message: 'El nombre no puede superar 150 caracteres.',
     };
   }
 
@@ -151,7 +116,7 @@ function validateMovementPayload(payload, options = {}) {
     };
   }
 
-  if (!Number.isFinite(cantidad) || cantidad <= 0 || cantidad > 9999999999.99) {
+  if (Number.isNaN(cantidad) || cantidad <= 0) {
     return {
       hasError: true,
       message: 'La cantidad debe ser mayor a 0.',
@@ -228,8 +193,6 @@ function getMovementsWithLatestEditQuery(whereClause = '') {
   return `
     SELECT
       m.id,
-      m.caja_id,
-      c.nombre AS caja_nombre,
       m.tipo,
       m.fecha,
       m.folio,
@@ -259,7 +222,6 @@ function getMovementsWithLatestEditQuery(whereClause = '') {
       latest_edit.comentario AS comentario_ultima_edicion,
       editor.username AS edited_by_username
     FROM movements m
-    INNER JOIN cash_boxes c ON c.id = m.caja_id
     LEFT JOIN users u ON u.id = m.created_by
     LEFT JOIN LATERAL (
       SELECT
@@ -307,21 +269,10 @@ async function getMovementWithLatestEditById(id) {
 // Propósito: obtener todos los movimientos.
 async function getMovements(req, res) {
   try {
-    const hasCashBoxParameter = Object.prototype.hasOwnProperty.call(req.query, 'caja_id');
-    const cajaId = Number(req.query.caja_id);
-
-    if (hasCashBoxParameter && (!Number.isInteger(cajaId) || cajaId <= 0)) {
-      return res.status(400).json({ message: 'El identificador de la caja no es válido.' });
-    }
-
-    const hasCashBoxFilter = hasCashBoxParameter;
-    const whereClause = hasCashBoxFilter ? 'WHERE m.caja_id = $1' : '';
-    const params = hasCashBoxFilter ? [cajaId] : [];
-
     const result = await pool.query(`
-      ${getMovementsWithLatestEditQuery(whereClause)}
+      ${getMovementsWithLatestEditQuery()}
       ORDER BY m.fecha DESC, m.id DESC
-    `, params);
+    `);
 
     res.json(result.rows);
   } catch (error) {
@@ -338,7 +289,7 @@ async function getMovementEditHistory(req, res) {
   try {
     const tipo = String(req.query.tipo || '').trim();
     const params = [];
-    const conditions = [];
+    let whereClause = '';
 
     if (tipo) {
       if (!VALID_TYPES.includes(tipo)) {
@@ -348,30 +299,14 @@ async function getMovementEditHistory(req, res) {
       }
 
       params.push(tipo);
-      conditions.push(`m.tipo = $${params.length}`);
+      whereClause = 'WHERE m.tipo = $1';
     }
-
-    const hasCashBoxParameter = Object.prototype.hasOwnProperty.call(req.query, 'caja_id');
-    const cajaId = Number(req.query.caja_id);
-
-    if (hasCashBoxParameter && (!Number.isInteger(cajaId) || cajaId <= 0)) {
-      return res.status(400).json({ message: 'El identificador de la caja no es válido.' });
-    }
-
-    if (hasCashBoxParameter) {
-      params.push(cajaId);
-      conditions.push(`m.caja_id = $${params.length}`);
-    }
-
-    const whereClause = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
 
     const result = await pool.query(
       `
       SELECT
         me.id AS edit_id,
         me.movement_id,
-        m.caja_id,
-        c.nombre AS caja_nombre,
         m.tipo,
         m.fecha,
         m.folio,
@@ -398,7 +333,6 @@ async function getMovementEditHistory(req, res) {
         editor.username AS edited_by_username
       FROM movement_edits me
       INNER JOIN movements m ON m.id = me.movement_id
-      INNER JOIN cash_boxes c ON c.id = m.caja_id
       LEFT JOIN users editor ON editor.id = me.edited_by
       ${whereClause}
       ORDER BY me.edited_at DESC, me.id DESC
@@ -429,8 +363,7 @@ async function createMovement(req, res) {
   const client = await pool.connect();
 
   try {
-    const requestBody = req.body && typeof req.body === 'object' ? req.body : {};
-    const validation = validateMovementPayload(requestBody, { requireFolio: false });
+    const validation = validateMovementPayload(req.body, { requireFolio: false });
 
     if (validation.hasError) {
       return res.status(400).json({
@@ -439,23 +372,8 @@ async function createMovement(req, res) {
     }
 
     const { tipo, fecha, nombre, descripcion, cantidad, moneda } = validation.data;
-    const cajaId = Number(requestBody.caja_id);
-
-    if (!Number.isInteger(cajaId) || cajaId <= 0) {
-      return res.status(400).json({ message: 'Selecciona una caja activa.' });
-    }
 
     await client.query('BEGIN');
-
-    const cashBoxResult = await client.query(
-      'SELECT id FROM cash_boxes WHERE id = $1 AND activa = TRUE FOR SHARE',
-      [cajaId],
-    );
-
-    if (cashBoxResult.rowCount === 0) {
-      await client.query('ROLLBACK');
-      return res.status(400).json({ message: 'La caja seleccionada no está activa.' });
-    }
 
     const folio = await generateNextFolio(client, fecha);
 
@@ -463,7 +381,6 @@ async function createMovement(req, res) {
       `
       INSERT INTO movements (
         tipo,
-        caja_id,
         fecha,
         folio,
         nombre,
@@ -472,10 +389,10 @@ async function createMovement(req, res) {
         moneda,
         created_by
       )
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
       RETURNING id
       `,
-      [tipo, cajaId, fecha, folio, nombre, descripcion, cantidad, moneda, req.user.id],
+      [tipo, fecha, folio, nombre, descripcion, cantidad, moneda, req.user.id],
     );
 
     await client.query('COMMIT');
@@ -515,8 +432,7 @@ async function updateMovement(req, res) {
     const id = getValidMovementId(req, res);
     if (!id) return undefined;
 
-    const requestBody = req.body && typeof req.body === 'object' ? req.body : {};
-    const validation = validateMovementPayload(requestBody, { requireFolio: false });
+    const validation = validateMovementPayload(req.body, { requireFolio: false });
 
     if (validation.hasError) {
       return res.status(400).json({
@@ -526,11 +442,7 @@ async function updateMovement(req, res) {
 
     // Propósito: tomar solo los campos editables; el folio se conserva como identificador original.
     const { tipo, fecha, nombre, descripcion, cantidad, moneda } = validation.data;
-    const comentario = String(requestBody.comentario || '').trim();
-
-    if (comentario.length > 255) {
-      return res.status(400).json({ message: 'El comentario no puede superar 255 caracteres.' });
-    }
+    const comentario = String(req.body.comentario || '').trim();
 
     await client.query('BEGIN');
 
@@ -707,24 +619,13 @@ async function deleteMovement(req, res) {
       `
       UPDATE movements
       SET tipo = 'cancelado'
-      WHERE id = $1 AND tipo <> 'cancelado'
+      WHERE id = $1
       RETURNING id
       `,
       [id],
     );
 
     if (result.rowCount === 0) {
-      const existingResult = await pool.query(
-        'SELECT tipo FROM movements WHERE id = $1',
-        [id],
-      );
-
-      if (existingResult.rowCount > 0 && existingResult.rows[0].tipo === 'cancelado') {
-        return res.status(400).json({
-          message: 'El movimiento ya se encuentra cancelado.',
-        });
-      }
-
       return res.status(404).json({
         message: 'No se encontró el movimiento que deseas cancelar.',
       });

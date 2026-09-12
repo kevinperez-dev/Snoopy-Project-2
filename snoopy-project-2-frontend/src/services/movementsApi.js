@@ -30,12 +30,7 @@ function getFriendlyMovementMessage(message = '') {
     return 'No se pudo guardar la información. Revisa los datos e intenta nuevamente.';
   }
 
-  if (
-    normalizedMessage.includes('unauthorized') ||
-    normalizedMessage.includes('no autorizado') ||
-    normalizedMessage.includes('sesión inválida') ||
-    normalizedMessage.includes('jwt')
-  ) {
+  if (normalizedMessage.includes('unauthorized') || normalizedMessage.includes('jwt')) {
     return 'Tu sesión terminó. Vuelve a iniciar sesión.';
   }
 
@@ -100,19 +95,12 @@ async function safeFetch(url, options = {}) {
 // Propósito: leer el JSON de una respuesta y manejar respuestas vacías sin romper la app.
 async function readJsonResponse(response) {
   const text = await response.text();
-  if (!text) return {};
-
-  try {
-    return JSON.parse(text);
-  } catch (error) {
-    throw new Error('El servidor devolvió una respuesta inválida.', { cause: error });
-  }
+  return text ? JSON.parse(text) : {};
 }
 
 // Propósito: obtener movimientos .
-export async function getMovements(cashBoxId = '') {
-  const query = cashBoxId ? `?caja_id=${encodeURIComponent(cashBoxId)}` : '';
-  const response = await safeFetch(`${API_BASE_URL}/movements${query}`, {
+export async function getMovements() {
+  const response = await safeFetch(`${API_BASE_URL}/movements`, {
     headers: {
       Authorization: `Bearer ${getAuthToken()}`,
     },
@@ -129,13 +117,8 @@ export async function getMovements(cashBoxId = '') {
 
 
 // Propósito: obtener el historial completo de ajustes; puede filtrarse por tipo de movimiento.
-export async function getMovementEditHistory(tipo = '', cashBoxId = '') {
-  const params = new URLSearchParams();
-
-  if (tipo) params.set('tipo', tipo);
-  if (cashBoxId) params.set('caja_id', cashBoxId);
-
-  const query = params.toString() ? `?${params.toString()}` : '';
+export async function getMovementEditHistory(tipo = '') {
+  const query = tipo ? `?tipo=${encodeURIComponent(tipo)}` : '';
 
   const response = await safeFetch(`${API_BASE_URL}/movements/edits/history${query}`, {
     headers: {

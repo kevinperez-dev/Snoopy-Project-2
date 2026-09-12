@@ -9,28 +9,8 @@ CREATE TABLE IF NOT EXISTS users (
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE IF NOT EXISTS cash_boxes (
-    id SERIAL PRIMARY KEY,
-    nombre VARCHAR(80) NOT NULL UNIQUE,
-    descripcion VARCHAR(255),
-    principal BOOLEAN NOT NULL DEFAULT FALSE,
-    activa BOOLEAN NOT NULL DEFAULT TRUE,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-
-ALTER TABLE cash_boxes ADD COLUMN IF NOT EXISTS principal BOOLEAN NOT NULL DEFAULT FALSE;
-
-INSERT INTO cash_boxes (nombre, descripcion, principal)
-VALUES
-    ('Caja normal', 'Caja principal de la operacion diaria.', TRUE),
-    ('Caja invitados', 'Caja separada para movimientos de invitados o personas externas.', FALSE)
-ON CONFLICT (nombre) DO NOTHING;
-
-UPDATE cash_boxes SET principal = TRUE, activa = TRUE WHERE nombre = 'Caja normal';
-
 CREATE TABLE IF NOT EXISTS movements (
     id SERIAL PRIMARY KEY,
-    caja_id INTEGER NOT NULL REFERENCES cash_boxes(id),
     tipo VARCHAR(20) NOT NULL CHECK (tipo IN ('ingreso', 'egreso', 'cancelado')),
     fecha DATE NOT NULL,
     folio VARCHAR(30) NOT NULL UNIQUE,
@@ -67,7 +47,6 @@ CREATE TABLE IF NOT EXISTS movement_edits (
 CREATE INDEX IF NOT EXISTS idx_movements_fecha ON movements(fecha);
 CREATE INDEX IF NOT EXISTS idx_movements_tipo ON movements(tipo);
 CREATE INDEX IF NOT EXISTS idx_movements_folio ON movements(folio);
-CREATE INDEX IF NOT EXISTS idx_movements_caja_id ON movements(caja_id);
 CREATE INDEX IF NOT EXISTS idx_movement_edits_movement_id ON movement_edits(movement_id);
 CREATE INDEX IF NOT EXISTS idx_movement_edits_edited_at ON movement_edits(edited_at);
 CREATE INDEX IF NOT EXISTS idx_movement_edits_edited_by ON movement_edits(edited_by);
