@@ -12,7 +12,7 @@
     "seed:admin": "node src/database/seedAdmin.js",
     "create:user": "node src/database/createUser.js",
     "db:init": "node src/database/initDatabase.js",
-    "db:migrate": "node src/database/runSqlFile.js src/database/add_cash_boxes.sql",
+    "db:migrate": "node src/database/runSqlFile.js src/database/add_cash_boxes.sql && node src/database/runSqlFile.js src/database/add_balances.sql",
     "db:setup": "npm run db:init && npm run db:migrate && npm run seed:admin",
     "render:build": "npm install && npm run db:setup"
   },
@@ -21,10 +21,15 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "express-rate-limit": "^8.7.0",
+    "helmet": "^8.3.0",
     "jsonwebtoken": "^9.0.2",
     "pg": "^8.13.1"
   },
   "devDependencies": {
     "nodemon": "^3.1.9"
+  },
+  "overrides": {
+    "qs": "6.16.0"
   }
 }

@@ -3,9 +3,14 @@ require("dotenv").config();
 
 // Importa Express para crear el servidor
 const express = require("express");
+const helmet = require("helmet");
 
 // Importa CORS para permitir peticiones desde el frontend
 const cors = require("cors");
+const {
+  apiLimiter,
+  validateRequiredEnvironment,
+} = require("./middlewares/security");
 
 // Importa las rutas de autenticación
 const authRoutes = require("./routes/auth.routes");
@@ -13,9 +18,17 @@ const authRoutes = require("./routes/auth.routes");
 // Importa las rutas de movimientos
 const movementsRoutes = require("./routes/movements.routes");
 const cashBoxesRoutes = require("./routes/cashBoxes.routes");
+const balancesRoutes = require("./routes/balances.routes");
+
+validateRequiredEnvironment();
 
 // Crea la aplicación Express
 const app = express();
+app.disable("x-powered-by");
+
+if (process.env.TRUST_PROXY === "true") {
+  app.set("trust proxy", 1);
+}
 
 // Define el puerto del servidor
 const PORT = process.env.PORT || 4000;
@@ -27,6 +40,12 @@ const allowedOrigins = (process.env.FRONTEND_URL || "http://localhost:5173")
   .filter(Boolean);
 
 // Configuración de CORS para frontend local y desplegado
+app.use(
+  helmet({
+    crossOriginResourcePolicy: false,
+  })
+);
+
 app.use(
   cors({
     origin(origin, callback) {
@@ -43,11 +62,14 @@ app.use(
       // Bloquea orígenes no permitidos
       return callback(new Error(`Origen no permitido por CORS: ${origin}`));
     },
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    maxAge: 600,
   })
 );
 
-// Permite recibir JSON desde el frontend
-app.use(express.json());
+// El backend solo procesa JSON pequeño; evita cargas accidentales o abusivas.
+app.use(express.json({ limit: "16kb", strict: true }));
 
 // Ruta raíz para comprobar que la API funciona
 app.get("/", (req, res) => {
@@ -66,11 +88,12 @@ app.get("/health", (req, res) => {
 });
 
 // Rutas de autenticación
-app.use("/api/auth", authRoutes);
+app.use("/api/auth", apiLimiter, authRoutes);
 
 // Rutas de movimientos
-app.use("/api/movements", movementsRoutes);
-app.use("/api/cajas", cashBoxesRoutes);
+app.use("/api/movements", apiLimiter, movementsRoutes);
+app.use("/api/cajas", apiLimiter, cashBoxesRoutes);
+app.use("/api/balanzas", apiLimiter, balancesRoutes);
 
 // Respuesta para rutas inexistentes
 app.use((req, res) => {
@@ -94,9 +117,20 @@ app.use((error, req, res, next) => {
     });
   }
 
+  if (error.type === 'entity.too.large') {
+    return res.status(413).json({
+      message: 'El cuerpo de la solicitud excede el límite permitido.',
+    });
+  }
+
+  if (String(error.message || '').startsWith('Origen no permitido por CORS')) {
+    return res.status(403).json({
+      message: 'Origen no permitido por CORS.',
+    });
+  }
+
   res.status(500).json({
     message: "Error interno del servidor.",
-    error: error.message,
   });
 });
 

@@ -52,8 +52,7 @@ async function login(req, res) {
       });
     }
 
-    // Crear token de sesión sin expiración automática por tiempo.
-    // La sesión se cerrará únicamente cuando el usuario presione "Cerrar sesión".
+    // Los tokens expiran para limitar el impacto de una sesión robada.
     const token = jwt.sign(
       {
         id: user.id,
@@ -61,6 +60,7 @@ async function login(req, res) {
         role: user.role,
       },
       process.env.JWT_SECRET,
+      { expiresIn: process.env.JWT_EXPIRES_IN || '8h' },
     );
 
     // Responder datos seguros del usuario

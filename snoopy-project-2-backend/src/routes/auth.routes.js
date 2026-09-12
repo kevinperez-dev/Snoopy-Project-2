@@ -4,11 +4,12 @@
 const express = require('express');
 const { login, me } = require('../controllers/auth.controller');
 const authMiddleware = require('../middlewares/auth.middleware');
+const { loginLimiter } = require('../middlewares/security');
 
 const router = express.Router();
 
 // Ruta para iniciar sesión
-router.post('/login', login);
+router.post('/login', loginLimiter, login);
 
 // Ruta para validar sesión actual
 router.get('/me', authMiddleware, me);
