@@ -229,6 +229,14 @@ function Header({
                         </div>
                     </div>
 
+                    <Link
+                        to="/balanza"
+                        className={`top-nav-link ${activePage === 'balanza' ? 'active' : ''}`}
+                    >
+                        <span className="material-icons-outlined top-nav-icon">balance</span>
+                        <span>Balanza</span>
+                    </Link>
+
                     {isAdmin && (
                         <Link
                             to="/configuracion/cajas"
@@ -324,6 +332,15 @@ function Header({
                             </button>
                         </div>
                     </div>
+
+                    <Link
+                        to="/balanza"
+                        className={`mobile-menu-item ${activePage === 'balanza' ? 'active' : ''}`}
+                        onClick={closeMobileMenu}
+                    >
+                        <span className="material-icons-outlined">balance</span>
+                        <span>Balanza</span>
+                    </Link>
 
                     <div className="mobile-menu-footer">
                         {isAdmin && (

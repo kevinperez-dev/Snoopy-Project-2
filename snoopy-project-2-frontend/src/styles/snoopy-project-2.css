@@ -5962,3 +5962,523 @@ body.modo-cancelado .report-table thead th {
     justify-content: space-between;
   }
 }
+
+/* =========================================================
+   BALANZA Y CONCILIACIÓN
+========================================================= */
+/* Propósito: organizar el conteo físico y la revisión de movimientos
+   sin mezclar la balanza con las operaciones de caja. */
+.balance-card {
+  padding: 22px;
+}
+
+.balance-filter-row {
+  display: grid;
+  grid-template-columns: minmax(180px, 0.9fr) minmax(180px, 0.9fr) minmax(180px, 0.9fr) minmax(260px, 1.3fr);
+  align-items: end;
+  gap: 16px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #eaecf0;
+}
+
+.balance-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+  background: #f8fafc;
+  color: #475467;
+  gap: 10px;
+}
+
+.balance-status span {
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.balance-status strong {
+  font-size: 0.9rem;
+  text-transform: capitalize;
+}
+
+.balance-status-cuadrada {
+  border-color: #86efac;
+  background: #f0fdf4;
+  color: #15803d;
+}
+
+.balance-status-faltante {
+  border-color: #fda4af;
+  background: #fff1f2;
+  color: #be123c;
+}
+
+.balance-status-sobrante {
+  border-color: #facc15;
+  background: #fffbeb;
+  color: #a16207;
+}
+
+.balance-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  padding: 20px 0;
+}
+
+.balance-summary-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  border: 1px solid #dbe3ec;
+  border-radius: 10px;
+  background: #f8fafc;
+}
+
+.balance-summary-item span {
+  color: #667085;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.balance-summary-item strong {
+  color: #1d2939;
+  font-size: 1.35rem;
+}
+
+.balance-difference-cuadrada strong {
+  color: #15803d;
+}
+
+.balance-difference-faltante strong {
+  color: #be123c;
+}
+
+.balance-difference-sobrante strong {
+  color: #a16207;
+}
+
+.balance-content-grid {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.85fr) minmax(360px, 1.15fr);
+  gap: 20px;
+}
+
+.balance-denominations-section,
+.balance-movements-section {
+  min-width: 0;
+  padding: 18px;
+  border: 1px solid #e4e7ec;
+  border-radius: 12px;
+  background: #ffffff;
+}
+
+.balance-section-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.balance-section-heading h2 {
+  margin: 0 0 4px;
+  color: #1d2939;
+  font-size: 1rem;
+}
+
+.balance-section-heading p {
+  margin: 0;
+  color: #667085;
+  font-size: 0.8rem;
+}
+
+.balance-currency-tag,
+.balance-review-count {
+  flex: 0 0 auto;
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: #eef6ff;
+  color: #175cd3;
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.denomination-list,
+.balance-movement-list {
+  max-height: 470px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.denomination-row {
+  display: grid;
+  grid-template-columns: minmax(72px, 1fr) 78px minmax(80px, 0.9fr);
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid #f0f2f5;
+}
+
+.denomination-row:last-child {
+  border-bottom: 0;
+}
+
+.denomination-value {
+  color: #344054;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.denomination-quantity {
+  height: 36px;
+  padding: 0 8px;
+  text-align: center;
+}
+
+.denomination-row strong {
+  color: #1d2939;
+  font-size: 0.9rem;
+  text-align: right;
+}
+
+.balance-movement-row {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  min-height: 58px;
+  padding: 8px 6px;
+  border-bottom: 1px solid #f0f2f5;
+  cursor: pointer;
+}
+
+.balance-movement-row:last-child {
+  border-bottom: 0;
+}
+
+.balance-movement-row:hover {
+  background: #f8fafc;
+}
+
+.balance-movement-row input {
+  width: 17px;
+  height: 17px;
+  accent-color: #175cd3;
+}
+
+.balance-movement-main {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.balance-movement-main strong {
+  color: #175cd3;
+  font-size: 0.85rem;
+}
+
+.balance-movement-main span {
+  overflow: hidden;
+  color: #667085;
+  font-size: 0.8rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.balance-movement-amount {
+  font-size: 0.9rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.balance-movement-amount.ingreso {
+  color: #15803d;
+}
+
+.balance-movement-amount.egreso {
+  color: #be123c;
+}
+
+.balance-list-empty {
+  padding: 36px 12px;
+  color: #667085;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.balance-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-top: 20px;
+  padding-top: 18px;
+  border-top: 1px solid #eaecf0;
+}
+
+.balance-actions p {
+  max-width: 620px;
+  margin: 0;
+  color: #667085;
+  font-size: 0.8rem;
+}
+
+.denomination-list::-webkit-scrollbar,
+.balance-movement-list::-webkit-scrollbar {
+  width: 9px;
+}
+
+.denomination-list::-webkit-scrollbar-thumb,
+.balance-movement-list::-webkit-scrollbar-thumb {
+  border: 2px solid #ffffff;
+  border-radius: 999px;
+  background: #98a2b3;
+}
+
+@media (max-width: 900px) {
+  .balance-filter-row,
+  .balance-content-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .balance-status {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 640px) {
+  .balance-card {
+    padding: 14px;
+  }
+
+  .balance-filter-row,
+  .balance-summary-grid,
+  .balance-content-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .balance-status {
+    grid-column: auto;
+  }
+
+  .balance-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .balance-actions .btn {
+    width: 100%;
+  }
+}
+
+/* Selector mensual de fechas: mantiene la altura de los filtros y abre un calendario legible. */
+.date-picker {
+  position: relative;
+  width: min(100%, 326px);
+}
+
+.date-picker.is-open {
+  z-index: 40;
+}
+
+.date-picker-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 1rem;
+  text-align: left;
+}
+
+.date-picker-trigger .material-icons-outlined {
+  color: #667085;
+  font-size: 1.2rem;
+}
+
+.form-group .date-picker-trigger {
+  height: auto;
+  min-height: 42px;
+  padding: 10px 12px;
+  border-color: #d4d4d4;
+  background: #fafafa;
+  font-size: 0.95rem;
+}
+
+.form-group .date-picker-trigger:focus {
+  border-color: var(--color-gold-soft);
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(184, 150, 69, 0.1);
+}
+
+.date-picker-placeholder {
+  color: #98a2b3;
+}
+
+.date-picker-popover {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  left: 0;
+  min-width: 304px;
+  padding: 12px;
+  border: 1px solid #cfd8e3;
+  border-radius: 10px;
+  background: #ffffff;
+  box-shadow: 0 14px 28px rgba(16, 24, 40, 0.18);
+}
+
+.date-picker-header {
+  display: grid;
+  grid-template-columns: 34px 1fr 34px;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 10px;
+  color: #1d2939;
+  text-align: center;
+  text-transform: capitalize;
+}
+
+.date-picker-nav {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: #344054;
+  cursor: pointer;
+}
+
+.date-picker-nav:hover,
+.date-picker-nav:focus-visible {
+  outline: none;
+  background: #eef6ff;
+  color: #175cd3;
+}
+
+.date-picker-nav .material-icons-outlined {
+  font-size: 1.35rem;
+}
+
+.date-picker-weekdays,
+.date-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(30px, 1fr));
+  gap: 3px;
+}
+
+.date-picker-weekdays {
+  margin-bottom: 4px;
+  color: #667085;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-align: center;
+}
+
+.date-picker-day {
+  min-height: 34px;
+  padding: 4px;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  background: #ffffff;
+  color: #344054;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.9rem;
+}
+
+.date-picker-day:hover,
+.date-picker-day:focus-visible {
+  outline: none;
+  border-color: #b2ddff;
+  background: #eef6ff;
+  color: #175cd3;
+}
+
+.date-picker-day.outside-month {
+  color: #98a2b3;
+}
+
+.date-picker-day.today {
+  border-color: #98a2b3;
+  font-weight: 800;
+}
+
+.date-picker-day.disabled {
+  color: #d0d5dd;
+  cursor: not-allowed;
+}
+
+.date-picker-day.selected,
+.date-picker-day.selected:hover,
+.date-picker-day.selected:focus-visible {
+  border-color: #175cd3;
+  background: #175cd3;
+  color: #ffffff;
+  font-weight: 800;
+}
+
+.date-picker-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #eaecf0;
+}
+
+.date-picker-footer-action {
+  padding: 6px 10px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #175cd3;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.date-picker-footer-action:hover,
+.date-picker-footer-action:focus-visible {
+  outline: none;
+  background: #eef6ff;
+}
+
+.date-picker-footer-action.primary {
+  background: #175cd3;
+  color: #ffffff;
+}
+
+.date-picker-footer-action.primary:hover,
+.date-picker-footer-action.primary:focus-visible {
+  background: #1849a9;
+}
+
+.date-picker-footer-action:disabled,
+.date-picker-footer-action.primary:disabled {
+  background: #eaecf0;
+  color: #98a2b3;
+  cursor: not-allowed;
+}
+
+@media (max-width: 640px) {
+  .date-picker-popover {
+    left: 50%;
+    min-width: min(304px, calc(100vw - 32px));
+    transform: translateX(-50%);
+  }
+}

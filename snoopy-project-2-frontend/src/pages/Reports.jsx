@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header.jsx';
 import CashBoxSelector from '../components/CashBoxSelector.jsx';
 import SelectDropdown from '../components/SelectDropdown.jsx';
+import DatePicker from '../components/DatePicker.jsx';
 import { useCashBoxes } from '../hooks/useCashBoxes.js';
 import {
   deleteMovement,
@@ -816,12 +817,12 @@ function Reports({ reportType = 'ingreso' }) {
 
             <div className="filter-box">
               <label htmlFor="reportFecha">Fecha</label>
-              <input
-                type="date"
+              <DatePicker
                 id="reportFecha"
-                className="filter-control"
                 value={date}
                 onChange={(event) => setDate(event.target.value)}
+                clearable
+                ariaLabel="Fecha del reporte"
               />
             </div>
 
@@ -1166,12 +1167,11 @@ function Reports({ reportType = 'ingreso' }) {
 
               <div className="filter-box">
                 <label htmlFor="editFecha">Fecha</label>
-                <input
-                  type="date"
+                <DatePicker
                   id="editFecha"
-                  className="filter-control"
                   value={editForm.fecha}
                   onChange={(event) => updateEditForm('fecha', event.target.value)}
+                  ariaLabel="Fecha del movimiento editado"
                 />
               </div>
 

@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import Header from '../components/Header.jsx';
 import CashBoxSelector from '../components/CashBoxSelector.jsx';
 import SelectDropdown from '../components/SelectDropdown.jsx';
+import DatePicker from '../components/DatePicker.jsx';
 import { useCashBoxes } from '../hooks/useCashBoxes.js';
 
 import Toast from '../components/ui/Toast.jsx';
@@ -466,12 +467,12 @@ function Dashboard() {
 
                 <div className="form-group">
                   <label htmlFor="fechaMovimiento">Fecha</label>
-                  <input
-                    type="date"
+                  <DatePicker
                     id="fechaMovimiento"
                     value={form.fecha}
                     max={getTodayISO()}
                     onChange={(event) => updateForm('fecha', event.target.value)}
+                    ariaLabel="Fecha del movimiento"
                   />
                 </div>
 

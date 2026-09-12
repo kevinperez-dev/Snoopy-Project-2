@@ -30,7 +30,10 @@ export function CashBoxProvider({ children }) {
       const activeBoxes = data.filter((cashBox) => cashBox.activa);
       const storedId = localStorage.getItem(SELECTED_CASH_BOX_KEY);
       const selectedExists = activeBoxes.some((cashBox) => String(cashBox.id) === String(storedId));
-      const nextId = selectedExists ? String(storedId) : String(activeBoxes[0]?.id || '');
+      const principalBox = activeBoxes.find((cashBox) => cashBox.principal);
+      const nextId = selectedExists
+        ? String(storedId)
+        : String(principalBox?.id || activeBoxes[0]?.id || '');
 
       setCashBoxes(data);
       setActiveCashBoxId(nextId);
