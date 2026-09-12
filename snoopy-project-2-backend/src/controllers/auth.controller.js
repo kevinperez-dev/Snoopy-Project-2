@@ -9,7 +9,8 @@ require('dotenv').config();
 // Iniciar sesión
 async function login(req, res) {
   try {
-    const { username, password } = req.body;
+    const requestBody = req.body && typeof req.body === 'object' ? req.body : {};
+    const { username, password } = requestBody;
 
     // Validar campos obligatorios
     if (!username || !password) {

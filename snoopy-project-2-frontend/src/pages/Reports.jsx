@@ -5,6 +5,9 @@ import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import Header from '../components/Header.jsx';
+import CashBoxSelector from '../components/CashBoxSelector.jsx';
+import SelectDropdown from '../components/SelectDropdown.jsx';
+import { useCashBoxes } from '../hooks/useCashBoxes.js';
 import {
   deleteMovement,
   getMovementEditHistory,
@@ -189,8 +192,11 @@ function getSafeReportType(value) {
   return 'ingreso';
 }
 
+const REPORT_PAGE_SIZE = 10;
+
 function Reports({ reportType = 'ingreso' }) {
   const navigate = useNavigate();
+  const { activeCashBoxId } = useCashBoxes();
 
   // Propósito: tipo de reporte que viene desde la ruta.
   const activeReportType = getSafeReportType(reportType);
@@ -238,6 +244,7 @@ function Reports({ reportType = 'ingreso' }) {
   const [description, setDescription] = useState('');
   const [currency, setCurrency] = useState('todos');
   const [amount, setAmount] = useState('');
+  const [currentReportPage, setCurrentReportPage] = useState(1);
 
   // Propósito: filtros aplicados al presionar Buscar.
   const [appliedFilters, setAppliedFilters] = useState({
@@ -341,6 +348,19 @@ function Reports({ reportType = 'ingreso' }) {
     });
   }, [records, appliedFilters, activeReportType]);
 
+  const reportPageCount = Math.max(1, Math.ceil(filteredRows.length / REPORT_PAGE_SIZE));
+  const safeReportPage = Math.min(currentReportPage, reportPageCount);
+  const paginatedRows = useMemo(() => {
+    const startIndex = (safeReportPage - 1) * REPORT_PAGE_SIZE;
+    return filteredRows.slice(startIndex, startIndex + REPORT_PAGE_SIZE);
+  }, [filteredRows, safeReportPage]);
+
+  useEffect(() => {
+    // Reinicia la página para que un cambio de filtro siempre empiece en el primer bloque.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setCurrentReportPage(1);
+  }, [activeReportType, activeCashBoxId, appliedFilters]);
+
   // Propósito: calcular totales de la tabla visible sin considerar movimientos cancelados.
   const reportTableTotals = useMemo(() => {
     return filteredRows.reduce(
@@ -383,7 +403,12 @@ function Reports({ reportType = 'ingreso' }) {
         setIsLoading(true);
         setApiError('');
 
-        const data = await getMovements();
+        if (!activeCashBoxId) {
+          setRecords([]);
+          return;
+        }
+
+        const data = await getMovements(activeCashBoxId);
         setRecords(data);
       } catch (error) {
         setApiError(error.message);
@@ -398,7 +423,7 @@ function Reports({ reportType = 'ingreso' }) {
     }
 
     loadReportsFromApi();
-  }, [navigate, activeReportType]);
+  }, [navigate, activeReportType, activeCashBoxId]);
 
   // Propósito: cargar el historial completo de ajustes cuando se abre Reportes > Cancelados.
   useEffect(() => {
@@ -415,7 +440,7 @@ function Reports({ reportType = 'ingreso' }) {
 
         // Propósito: mostrar en este apartado todo el historial de ediciones existente,
         // no solo el de movimientos que ya fueron cancelados.
-        const data = await getMovementEditHistory();
+        const data = await getMovementEditHistory('', activeCashBoxId);
         setEditHistoryRows(data);
       } catch (error) {
         setEditHistoryRows([]);
@@ -426,7 +451,7 @@ function Reports({ reportType = 'ingreso' }) {
     }
 
     loadCanceledEditHistory();
-  }, [isCanceledReport]);
+  }, [isCanceledReport, activeCashBoxId]);
 
   // Propósito: aplicar clases generales del body y cambiar color base según sección activa.
   useEffect(() => {
@@ -736,7 +761,7 @@ function Reports({ reportType = 'ingreso' }) {
         <section className="page-header screenshot-style-header">
           <div>
             <h1>{activeSection.title}</h1>
-            <p>{activeSection.description}</p>
+            <p>{activeSection.description} Selecciona una caja para consultar sus movimientos.</p>
           </div>
         </section>
 
@@ -761,38 +786,32 @@ function Reports({ reportType = 'ingreso' }) {
           </div>
 
           <div className="reports-filters-strip reports-filters-separated">
+            <CashBoxSelector label="Caja" />
+
             <div className="filter-box">
               <label htmlFor="reportPeriodo">Periodo</label>
-              <select
+              <SelectDropdown
                 id="reportPeriodo"
-                className="filter-control"
                 value={period}
+                options={years.map((year) => ({ value: year, label: year }))}
                 onChange={(event) => setPeriod(event.target.value)}
-              >
-                {years.map((year) => (
-                  <option key={year} value={year}>
-                    {year}
-                  </option>
-                ))}
-              </select>
+              />
             </div>
 
             <div className="filter-box">
               <label htmlFor="reportSemana">Semana</label>
-              <select
+              <SelectDropdown
                 id="reportSemana"
-                className="filter-control"
                 value={selectedReportWeek}
+                options={[
+                  { value: 'todas', label: 'Todas' },
+                  ...weeks.map((itemWeek) => ({
+                    value: String(itemWeek),
+                    label: getWeekLabel(Number(period), itemWeek),
+                  })),
+                ]}
                 onChange={(event) => setWeek(event.target.value)}
-              >
-                <option value="todas">Todas</option>
-
-                {weeks.map((itemWeek) => (
-                  <option key={itemWeek} value={String(itemWeek)}>
-                    {getWeekLabel(Number(period), itemWeek)}
-                  </option>
-                ))}
-              </select>
+              />
             </div>
 
             <div className="filter-box">
@@ -844,29 +863,28 @@ function Reports({ reportType = 'ingreso' }) {
 
             <div className="filter-box">
               <label htmlFor="reportMoneda">Moneda</label>
-              <select
+              <SelectDropdown
                 id="reportMoneda"
-                className="filter-control"
                 value={currency}
+                options={[
+                  { value: 'todos', label: 'Todas' },
+                  { value: 'Dolares', label: 'Dólares' },
+                  { value: 'Pesos', label: 'Pesos' },
+                ]}
                 onChange={(event) => setCurrency(event.target.value)}
-              >
-                <option value="todos">Todas</option>
-                <option value="Dolares">Dólares</option>
-                <option value="Pesos">Pesos</option>
-              </select>
+              />
             </div>
 
             <div className="filter-box">
               <label htmlFor="reportCantidad">Cantidad</label>
               <input
-                type="number"
+                type="text"
+                inputMode="decimal"
                 id="reportCantidad"
                 className="filter-control"
-                min="0"
-                step="0.01"
                 placeholder="0.00"
-                value={amount}
-                onChange={(event) => setAmount(event.target.value)}
+                value={formatAmountInputValue(amount)}
+                onChange={(event) => setAmount(normalizeAmountInput(event.target.value))}
               />
             </div>
 
@@ -914,7 +932,7 @@ function Reports({ reportType = 'ingreso' }) {
                     </td>
                   </tr>
                 ) : (
-                  filteredRows.map((record) => {
+                  paginatedRows.map((record) => {
                     const info = getISOWeekInfo(record.fecha);
                     const isDeletingCurrentRow = deletingId === record.id;
                     const isCanceledRow = record.tipo === 'cancelado';
@@ -989,6 +1007,23 @@ function Reports({ reportType = 'ingreso' }) {
               )}
             </table>
           </div>
+
+          {filteredRows.length > REPORT_PAGE_SIZE && (
+            <div className="table-pagination" aria-label="Paginación de reportes">
+              <span>
+                Mostrando {(safeReportPage - 1) * REPORT_PAGE_SIZE + 1}-{Math.min(safeReportPage * REPORT_PAGE_SIZE, filteredRows.length)} de {filteredRows.length}
+              </span>
+              <div className="table-pagination-actions">
+                <button type="button" className="btn btn-light" onClick={() => setCurrentReportPage((page) => Math.max(1, page - 1))} disabled={safeReportPage === 1}>
+                  Anterior
+                </button>
+                <strong>Página {safeReportPage} de {reportPageCount}</strong>
+                <button type="button" className="btn btn-light" onClick={() => setCurrentReportPage((page) => Math.min(reportPageCount, page + 1))} disabled={safeReportPage === reportPageCount}>
+                  Siguiente
+                </button>
+              </div>
+            </div>
+          )}
         </section>
 
         {isCanceledReport && (
@@ -1118,15 +1153,15 @@ function Reports({ reportType = 'ingreso' }) {
             <div className="report-modal-grid">
               <div className="filter-box">
                 <label htmlFor="editTipo">Tipo</label>
-                <select
+                <SelectDropdown
                   id="editTipo"
-                  className="filter-control"
                   value={editForm.tipo}
+                  options={[
+                    { value: 'ingreso', label: 'Ingresos' },
+                    { value: 'egreso', label: 'Egresos' },
+                  ]}
                   onChange={(event) => updateEditForm('tipo', event.target.value)}
-                >
-                  <option value="ingreso">Ingresos</option>
-                  <option value="egreso">Egresos</option>
-                </select>
+                />
               </div>
 
               <div className="filter-box">

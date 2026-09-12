@@ -6,16 +6,21 @@ import Login from './pages/Login.jsx';
 import Home from './pages/Home.jsx';
 import Dashboard from './pages/Dashboard.jsx';
 import Reports from './pages/Reports.jsx';
+import CashBoxes from './pages/CashBoxes.jsx';
+import { CashBoxProvider } from './context/CashBoxContext.jsx';
 
 function App() {
   return (
     <BrowserRouter>
-      <Routes>
+      <CashBoxProvider>
+        <Routes>
         <Route path="/" element={<Navigate to="/inicio" replace />} />
 
         <Route path="/login" element={<Login />} />
         <Route path="/inicio" element={<Home />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/cajas" element={<Navigate to="/configuracion/cajas" replace />} />
+        <Route path="/configuracion/cajas" element={<CashBoxes />} />
 
         {/* Rutas separadas para reportes desde el menú desplegable del header */}
         <Route path="/reports" element={<Navigate to="/reports/ingresos" replace />} />
@@ -24,7 +29,8 @@ function App() {
         <Route path="/reports/cancelados" element={<Reports reportType="cancelado" />} />
 
         <Route path="*" element={<Navigate to="/inicio" replace />} />
-      </Routes>
+        </Routes>
+      </CashBoxProvider>
     </BrowserRouter>
   );
 }

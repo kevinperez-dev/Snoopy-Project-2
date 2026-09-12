@@ -1,6 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import Header from '../components/Header.jsx';
+import CashBoxSelector from '../components/CashBoxSelector.jsx';
+import SelectDropdown from '../components/SelectDropdown.jsx';
+import { useCashBoxes } from '../hooks/useCashBoxes.js';
 
 import Toast from '../components/ui/Toast.jsx';
 import { getCurrentISOWeek, getISOWeekInfo, getMaxAllowedWeekForYear, getTodayISO, getWeekLabel, formatShortDate } from '../utils/dates.js';
@@ -42,6 +45,8 @@ const modeConfig = {
     excelHeaderColor: '#F0DC84'
   }
 };
+
+const DASHBOARD_PAGE_SIZE = 8;
 
 
 // Propósito: limpiar la cantidad escrita por el usuario, permitiendo solo números y un punto decimal.
@@ -95,6 +100,7 @@ function Dashboard() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const labelSheetRef = useRef(null);
+  const { activeCashBoxId } = useCashBoxes();
 
   // Registros principales cargados desde PostgreSQL.
   const [records, setRecords] = useState([]);
@@ -111,6 +117,7 @@ function Dashboard() {
   const [week, setWeek] = useState(String(getCurrentISOWeek().week));
   const [folioSearch, setFolioSearch] = useState('');
   const [appliedFolioSearch, setAppliedFolioSearch] = useState('');
+  const [currentDashboardPage, setCurrentDashboardPage] = useState(1);
 
   // Notificación y resaltado de registros nuevos.
   const [toast, setToast] = useState(null);
@@ -175,6 +182,19 @@ function Dashboard() {
     });
   }, [records, type, period, selectedWeek, appliedFolioSearch]);
 
+  const dashboardPageCount = Math.max(1, Math.ceil(filteredRows.length / DASHBOARD_PAGE_SIZE));
+  const safeDashboardPage = Math.min(currentDashboardPage, dashboardPageCount);
+  const paginatedRows = useMemo(() => {
+    const startIndex = (safeDashboardPage - 1) * DASHBOARD_PAGE_SIZE;
+    return filteredRows.slice(startIndex, startIndex + DASHBOARD_PAGE_SIZE);
+  }, [filteredRows, safeDashboardPage]);
+
+  useEffect(() => {
+    // Reinicia la página para que un cambio de filtro siempre empiece en el primer bloque.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setCurrentDashboardPage(1);
+  }, [type, period, selectedWeek, appliedFolioSearch, activeCashBoxId]);
+
   // Calcula el total visible de la semana seleccionada, separado por dólares y pesos.
   const tableTotals = useMemo(() => {
     return filteredRows.reduce(
@@ -213,7 +233,12 @@ function Dashboard() {
         setIsLoading(true);
         setApiError('');
 
-        const data = await getMovements();
+        if (!activeCashBoxId) {
+          setRecords([]);
+          return;
+        }
+
+        const data = await getMovements(activeCashBoxId);
         setRecords(data);
       } catch (error) {
         setApiError(error.message);
@@ -228,7 +253,7 @@ function Dashboard() {
     }
 
     loadMovementsFromApi();
-  }, [navigate]);
+  }, [navigate, activeCashBoxId]);
 
   // Aplica las clases del body para respetar los colores de ingreso/egreso.
   useEffect(() => {
@@ -293,7 +318,8 @@ function Dashboard() {
       !form.nombre.trim() ||
       !form.descripcion.trim() ||
       Number(form.cantidad) <= 0 ||
-      !form.moneda
+      !form.moneda ||
+      !activeCashBoxId
     ) {
       setToast({
         title: 'Aviso',
@@ -309,7 +335,8 @@ function Dashboard() {
       nombre: form.nombre.trim(),
       descripcion: form.descripcion.trim(),
       cantidad: Number(form.cantidad),
-      moneda: form.moneda
+      moneda: form.moneda,
+      caja_id: activeCashBoxId
     };
 
     try {
@@ -407,7 +434,7 @@ function Dashboard() {
         <section className="page-header screenshot-style-header">
           <div>
             <h1>Movimientos</h1>
-            <p>Consulta y registra movimientos por semana.</p>
+            <p>Consulta y registra movimientos en la caja que selecciones.</p>
           </div>
         </section>
 
@@ -425,12 +452,18 @@ function Dashboard() {
         <section className="main-grid">
           <div className="card form-card">
             <div className="card-header">
-              <h2>Formulario de movimiento</h2>
-              <span className="mode-pill">{config.pillText}</span>
+              <div>
+                <h2>Formulario de movimiento</h2>
+              </div>
+              <div className="dashboard-form-header-actions">
+                <span className="mode-pill">{config.pillText}</span>
+              </div>
             </div>
 
             <form className="label-form" autoComplete="off">
               <div className="form-grid one-column">
+                <CashBoxSelector label="Caja destino" />
+
                 <div className="form-group">
                   <label htmlFor="fechaMovimiento">Fecha</label>
                   <input
@@ -610,33 +643,26 @@ Detalle: Zoto / Ramón`}
             <div className="history-filter-grid">
               <div className="filter-box filter-small">
                 <label htmlFor="periodoSelect">Periodo</label>
-                <select
+                <SelectDropdown
                   id="periodoSelect"
-                  className="filter-control"
                   value={period}
+                  options={years.map((year) => ({ value: year, label: year }))}
                   onChange={(event) => setPeriod(event.target.value)}
-                >
-                  {years.map((year) => (
-                    <option key={year} value={year}>{year}</option>
-                  ))}
-                </select>
+                />
               </div>
 
               <div className="filter-box filter-large">
                 <label htmlFor="semanaSelect">A la semana</label>
                 {/* Selector de semana del historial */}
-                <select
+                <SelectDropdown
                   id="semanaSelect"
-                  className="filter-control"
                   value={selectedWeek}
+                  options={weeks.map((itemWeek) => ({
+                    value: itemWeek,
+                    label: getWeekLabel(Number(period), itemWeek),
+                  }))}
                   onChange={(event) => setWeek(event.target.value)}
-                >
-                  {weeks.map((itemWeek) => (
-                    <option key={itemWeek} value={itemWeek}>
-                      {getWeekLabel(Number(period), itemWeek)}
-                    </option>
-                  ))}
-                </select>
+                />
               </div>
 
               <div className="filter-box filter-search">
@@ -715,7 +741,7 @@ Detalle: Zoto / Ramón`}
                     </td>
                   </tr>
                 ) : (
-                  filteredRows.map((record) => {
+                  paginatedRows.map((record) => {
                     const info = getISOWeekInfo(record.fecha);
 
                     return (
@@ -747,6 +773,23 @@ Detalle: Zoto / Ramón`}
               )}
             </table>
           </div>
+
+          {filteredRows.length > DASHBOARD_PAGE_SIZE && (
+            <div className="table-pagination" aria-label="Paginación de movimientos">
+              <span>
+                Mostrando {(safeDashboardPage - 1) * DASHBOARD_PAGE_SIZE + 1}-{Math.min(safeDashboardPage * DASHBOARD_PAGE_SIZE, filteredRows.length)} de {filteredRows.length}
+              </span>
+              <div className="table-pagination-actions">
+                <button type="button" className="btn btn-light" onClick={() => setCurrentDashboardPage((page) => Math.max(1, page - 1))} disabled={safeDashboardPage === 1}>
+                  Anterior
+                </button>
+                <strong>Página {safeDashboardPage} de {dashboardPageCount}</strong>
+                <button type="button" className="btn btn-light" onClick={() => setCurrentDashboardPage((page) => Math.min(dashboardPageCount, page + 1))} disabled={safeDashboardPage === dashboardPageCount}>
+                  Siguiente
+                </button>
+              </div>
+            </div>
+          )}
         </section>
       </main>
 

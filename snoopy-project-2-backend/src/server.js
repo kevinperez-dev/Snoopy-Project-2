@@ -12,6 +12,7 @@ const authRoutes = require("./routes/auth.routes");
 
 // Importa las rutas de movimientos
 const movementsRoutes = require("./routes/movements.routes");
+const cashBoxesRoutes = require("./routes/cashBoxes.routes");
 
 // Crea la aplicación Express
 const app = express();
@@ -69,6 +70,7 @@ app.use("/api/auth", authRoutes);
 
 // Rutas de movimientos
 app.use("/api/movements", movementsRoutes);
+app.use("/api/cajas", cashBoxesRoutes);
 
 // Respuesta para rutas inexistentes
 app.use((req, res) => {
@@ -85,6 +87,12 @@ app.use((error, req, res, next) => {
     path: req.originalUrl,
     method: req.method,
   });
+
+  if (error.type === 'entity.parse.failed') {
+    return res.status(400).json({
+      message: 'El cuerpo de la solicitud no contiene un JSON válido.',
+    });
+  }
 
   res.status(500).json({
     message: "Error interno del servidor.",
