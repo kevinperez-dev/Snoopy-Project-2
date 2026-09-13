@@ -18,7 +18,6 @@ const authRoutes = require("./routes/auth.routes");
 // Importa las rutas de movimientos
 const movementsRoutes = require("./routes/movements.routes");
 const cashBoxesRoutes = require("./routes/cashBoxes.routes");
-const balancesRoutes = require("./routes/balances.routes");
 
 validateRequiredEnvironment();
 
@@ -93,7 +92,6 @@ app.use("/api/auth", apiLimiter, authRoutes);
 // Rutas de movimientos
 app.use("/api/movements", apiLimiter, movementsRoutes);
 app.use("/api/cajas", apiLimiter, cashBoxesRoutes);
-app.use("/api/balanzas", apiLimiter, balancesRoutes);
 
 // Respuesta para rutas inexistentes
 app.use((req, res) => {

@@ -7,7 +7,6 @@ import Home from './pages/Home.jsx';
 import Dashboard from './pages/Dashboard.jsx';
 import Reports from './pages/Reports.jsx';
 import CashBoxes from './pages/CashBoxes.jsx';
-import Balances from './pages/Balances.jsx';
 import { CashBoxProvider } from './context/CashBoxContext.jsx';
 
 function App() {
@@ -22,7 +21,7 @@ function App() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/cajas" element={<Navigate to="/configuracion/cajas" replace />} />
         <Route path="/configuracion/cajas" element={<CashBoxes />} />
-        <Route path="/balanza" element={<Balances />} />
+        <Route path="/balanza" element={<Navigate to="/inicio" replace />} />
 
         {/* Rutas separadas para reportes desde el menú desplegable del header */}
         <Route path="/reports" element={<Navigate to="/reports/ingresos" replace />} />
