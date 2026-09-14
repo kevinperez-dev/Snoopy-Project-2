@@ -1,13 +1,17 @@
 // Archivo: src/utils/folio.js
 // Propósito: generar folios automáticos con base en fecha y movimientos existentes.
 
-export function generateAutoFolio(dateISO, records) {
+export function generateAutoFolio(dateISO, records, cashBoxKey = '') {
   if (!dateISO) return '';
 
   // Propósito: formar el prefijo del folio con la fecha seleccionada.
   // Ejemplo: 2026-05-10 => 260510.
   const [year, month, day] = dateISO.split('-');
-  const prefix = `${year.slice(-2)}${month}${day}`;
+  const datePrefix = `${year.slice(-2)}${month}${day}`;
+  const normalizedCashBoxKey = String(cashBoxKey || '').trim().toUpperCase();
+  const prefix = /^[A-Z]+$/.test(normalizedCashBoxKey)
+    ? `${normalizedCashBoxKey}-${datePrefix}`
+    : datePrefix;
 
   // Propósito: revisar todos los folios existentes del mismo día para evitar duplicados.
   const recordsOfDay = records.filter((record) => {

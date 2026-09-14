@@ -15,19 +15,29 @@ import { isAuthenticated } from '../utils/session.js';
 
 
 // Propósito: cargar el saldo inicial guardado por semana y moneda.
-function getStoredBalances(year, weekNumber, cashBoxId = '1') {
+function getStoredBalances(year, weekNumber, cashBoxId = '1', isPrincipalCashBox) {
     const oldSingleBalanceKey = `snoopyProject2SaldoInicial_${year}_${weekNumber}`;
     const pesosKey = `snoopyProject2SaldoInicialPesos_${cashBoxId}_${year}_${weekNumber}`;
     const dollarsKey = `snoopyProject2SaldoInicialDolares_${cashBoxId}_${year}_${weekNumber}`;
     const legacyPesosKey = `snoopyProject2SaldoInicialPesos_${year}_${weekNumber}`;
     const legacyDollarsKey = `snoopyProject2SaldoInicialDolares_${year}_${weekNumber}`;
+    const moneyTrackPesosKey = `moneyTrackSaldoInicialPesos_${year}_${weekNumber}`;
+    const moneyTrackDollarsKey = `moneyTrackSaldoInicialDolares_${year}_${weekNumber}`;
+    const moneyTrackOldSingleBalanceKey = `pegasoSaldoInicial_${year}_${weekNumber}`;
+    const shouldUseHistoricalBalances = isPrincipalCashBox ?? String(cashBoxId) === '1';
 
     return {
-        pesos: localStorage.getItem(pesosKey) ?? (String(cashBoxId) === '1'
-            ? localStorage.getItem(legacyPesosKey) ?? localStorage.getItem(oldSingleBalanceKey)
+        // Solo la caja principal puede recuperar las claves globales de MoneyTrack.
+        // Las cajas adicionales deben iniciar con su propio saldo para no mezclar importes.
+        pesos: localStorage.getItem(pesosKey) ?? (shouldUseHistoricalBalances
+            ? localStorage.getItem(legacyPesosKey)
+                ?? localStorage.getItem(oldSingleBalanceKey)
+                ?? localStorage.getItem(moneyTrackPesosKey)
+                ?? localStorage.getItem(moneyTrackOldSingleBalanceKey)
             : null) ?? '0',
-        dolares: localStorage.getItem(dollarsKey) ?? (String(cashBoxId) === '1'
+        dolares: localStorage.getItem(dollarsKey) ?? (shouldUseHistoricalBalances
             ? localStorage.getItem(legacyDollarsKey)
+                ?? localStorage.getItem(moneyTrackDollarsKey)
             : null) ?? '0'
     };
 }
@@ -698,7 +708,7 @@ async function downloadExcelWithSummaryImage({ fileName, sheetName, weekText, su
 
 function Home() {
     const navigate = useNavigate();
-    const { activeCashBoxId } = useCashBoxes();
+    const { activeCashBox, activeCashBoxId } = useCashBoxes();
 
     // Movimientos cargados desde PostgreSQL
     const [records, setRecords] = useState([]);
@@ -714,7 +724,12 @@ function Home() {
 
     // Saldo inicial temporal por semana y moneda
     // Después se puede guardar en PostgreSQL con una tabla weekly_balances
-    const initialStoredBalances = getStoredBalances(currentWeek.year, currentWeek.week, activeCashBoxId);
+    const initialStoredBalances = getStoredBalances(
+        currentWeek.year,
+        currentWeek.week,
+        activeCashBoxId,
+        activeCashBox?.principal
+    );
     const [manualStartingBalancePesos, setManualStartingBalancePesos] = useState(initialStoredBalances.pesos);
     const [manualStartingBalanceDolares, setManualStartingBalanceDolares] = useState(initialStoredBalances.dolares);
 
@@ -774,10 +789,15 @@ function Home() {
 
     // Carga el saldo inicial manual correspondiente cuando cambia el periodo o la semana.
     const loadStartingBalances = useCallback((year, weekNumber) => {
-        const storedBalances = getStoredBalances(year, weekNumber, activeCashBoxId);
+        const storedBalances = getStoredBalances(
+            year,
+            weekNumber,
+            activeCashBoxId,
+            activeCashBox?.principal
+        );
         setManualStartingBalancePesos(storedBalances.pesos);
         setManualStartingBalanceDolares(storedBalances.dolares);
-    }, [activeCashBoxId]);
+    }, [activeCashBox, activeCashBoxId]);
 
     // Propósito: cargar los saldos manuales propios de la caja recién seleccionada.
     useEffect(() => {
@@ -826,7 +846,12 @@ function Home() {
             .sort((a, b) => a.start - b.start);
 
         const baseWeekInfo = sortedWeekStarts[0];
-        const baseBalances = getStoredBalances(baseWeekInfo.year, baseWeekInfo.week, activeCashBoxId);
+        const baseBalances = getStoredBalances(
+            baseWeekInfo.year,
+            baseWeekInfo.week,
+            activeCashBoxId,
+            activeCashBox?.principal
+        );
 
         const carriedBalances = relevantRecords.reduce(
             (accumulator, record) => {
@@ -863,6 +888,7 @@ function Home() {
         };
     }, [
         activeRecords,
+        activeCashBox,
         activeCashBoxId,
         period,
         selectedWeek,
@@ -1290,7 +1316,8 @@ function Home() {
                                             ? computedInitialBalances.dolares
                                             : manualStartingBalanceDolares
                                     )}
-                                    disabled={computedInitialBalances.isAutomatic}
+                                    // El saldo inicial se muestra como referencia y no se edita desde Inicio.
+                                    disabled
                                     onChange={(event) => {
                                         setManualStartingBalanceDolares(cleanBalanceInputValue(event.target.value));
                                     }}
@@ -1310,7 +1337,8 @@ function Home() {
                                             ? computedInitialBalances.pesos
                                             : manualStartingBalancePesos
                                     )}
-                                    disabled={computedInitialBalances.isAutomatic}
+                                    // El saldo inicial se muestra como referencia y no se edita desde Inicio.
+                                    disabled
                                     onChange={(event) => {
                                         setManualStartingBalancePesos(cleanBalanceInputValue(event.target.value));
                                     }}

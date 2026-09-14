@@ -180,10 +180,16 @@ function getFolioPrefixFromDate(fecha) {
   return `${year.slice(-2)}${month}${day}`;
 }
 
-// Propósito: generar el siguiente folio disponible usando el prefijo YYMMDD,
-// sin depender de la fecha actual guardada en el movimiento.
-async function generateNextFolio(client, fecha) {
-  const prefix = getFolioPrefixFromDate(fecha);
+// Propósito: generar el siguiente folio disponible por caja y fecha.
+async function generateNextFolio(client, fecha, cashBoxKey) {
+  const datePrefix = getFolioPrefixFromDate(fecha);
+  const normalizedCashBoxKey = String(cashBoxKey || '').trim().toUpperCase();
+
+  if (!/^[A-Z]+$/.test(normalizedCashBoxKey)) {
+    throw new Error('La caja seleccionada no tiene una clave válida.');
+  }
+
+  const prefix = `${normalizedCashBoxKey}-${datePrefix}`;
 
   // Propósito: bloquear la generación por prefijo para evitar que dos usuarios
   // creen el mismo folio al guardar casi al mismo tiempo.
@@ -196,11 +202,12 @@ async function generateNextFolio(client, fecha) {
   // aunque el movimiento haya sido editado y ahora tenga otra fecha.
   const result = await client.query(
     `
-    SELECT COALESCE(MAX(CAST(SUBSTRING(folio FROM 7) AS INTEGER)), 0) AS max_sequence
+    SELECT COALESCE(MAX(CAST(SUBSTRING(folio FROM LENGTH($1) + 1) AS INTEGER)), 0) AS max_sequence
     FROM movements
-    WHERE folio ~ $1
+    WHERE folio LIKE $1 || '%'
+      AND folio ~ $2
     `,
-    [`^${prefix}[0-9]+$`],
+    [prefix, `^${prefix.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}[0-9]+$`],
   );
 
   const nextSequence = Number(result.rows[0]?.max_sequence || 0) + 1;
@@ -448,7 +455,7 @@ async function createMovement(req, res) {
     await client.query('BEGIN');
 
     const cashBoxResult = await client.query(
-      'SELECT id FROM cash_boxes WHERE id = $1 AND activa = TRUE FOR SHARE',
+      'SELECT id, clave FROM cash_boxes WHERE id = $1 AND activa = TRUE FOR SHARE',
       [cajaId],
     );
 
@@ -457,7 +464,7 @@ async function createMovement(req, res) {
       return res.status(400).json({ message: 'La caja seleccionada no está activa.' });
     }
 
-    const folio = await generateNextFolio(client, fecha);
+    const folio = await generateNextFolio(client, fecha, cashBoxResult.rows[0].clave);
 
     const result = await client.query(
       `

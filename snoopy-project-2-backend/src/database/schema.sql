@@ -15,18 +15,40 @@ CREATE TABLE IF NOT EXISTS cash_boxes (
     descripcion VARCHAR(255),
     principal BOOLEAN NOT NULL DEFAULT FALSE,
     activa BOOLEAN NOT NULL DEFAULT TRUE,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    clave VARCHAR(10) NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT cash_boxes_clave_unique UNIQUE (clave),
+    CONSTRAINT cash_boxes_clave_format_check CHECK (clave ~ '^[A-Z]+$')
 );
 
 ALTER TABLE cash_boxes ADD COLUMN IF NOT EXISTS principal BOOLEAN NOT NULL DEFAULT FALSE;
+ALTER TABLE cash_boxes ADD COLUMN IF NOT EXISTS clave VARCHAR(10);
+ALTER TABLE cash_boxes ALTER COLUMN clave TYPE VARCHAR(10);
 
-INSERT INTO cash_boxes (nombre, descripcion, principal)
+INSERT INTO cash_boxes (nombre, descripcion, principal, clave)
 VALUES
-    ('Caja normal', 'Caja principal de la operacion diaria.', TRUE),
-    ('Caja invitados', 'Caja separada para movimientos de invitados o personas externas.', FALSE)
+    ('Caja normal', 'Caja principal de la operacion diaria.', TRUE, 'A'),
+    ('Caja invitados', 'Caja separada para movimientos de invitados o personas externas.', FALSE, 'B')
 ON CONFLICT (nombre) DO NOTHING;
 
 UPDATE cash_boxes SET principal = TRUE, activa = TRUE WHERE nombre = 'Caja normal';
+
+UPDATE cash_boxes SET clave = 'A' WHERE principal = TRUE;
+
+WITH cajas_sin_clave AS (
+    SELECT
+        id,
+        chr(65 + row_number() OVER (ORDER BY id)::integer) AS clave_nueva
+    FROM cash_boxes
+    WHERE principal = FALSE
+      AND clave IS NULL
+)
+UPDATE cash_boxes cb
+SET clave = csc.clave_nueva
+FROM cajas_sin_clave csc
+WHERE cb.id = csc.id;
+
+ALTER TABLE cash_boxes ALTER COLUMN clave SET NOT NULL;
 
 CREATE TABLE IF NOT EXISTS movements (
     id SERIAL PRIMARY KEY,

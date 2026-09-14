@@ -2,6 +2,39 @@
 
 const pool = require('../config/db');
 
+function numberToCashBoxKey(value) {
+  let remaining = value;
+  let key = '';
+
+  while (remaining > 0) {
+    remaining -= 1;
+    key = String.fromCharCode(65 + (remaining % 26)) + key;
+    remaining = Math.floor(remaining / 26);
+  }
+
+  return key;
+}
+
+function cashBoxKeyToNumber(value) {
+  const normalized = String(value || '').trim().toUpperCase();
+
+  if (!/^[A-Z]+$/.test(normalized)) return 0;
+
+  return [...normalized].reduce((total, character) => (
+    (total * 26) + character.charCodeAt(0) - 64
+  ), 0);
+}
+
+async function getNextCashBoxKey(client) {
+  const result = await client.query('SELECT clave FROM cash_boxes FOR UPDATE');
+  const highestKey = result.rows.reduce(
+    (highest, row) => Math.max(highest, cashBoxKeyToNumber(row.clave)),
+    1,
+  );
+
+  return numberToCashBoxKey(highestKey + 1);
+}
+
 function requireAdmin(req, res, next) {
   if (req.user?.role !== 'admin') {
     return res.status(403).json({
@@ -30,6 +63,7 @@ async function getCashBoxes(req, res) {
         cb.id,
         cb.nombre,
         cb.descripcion,
+        cb.clave,
         cb.principal,
         cb.activa,
         cb.created_at,
@@ -64,24 +98,36 @@ async function createCashBox(req, res) {
     return res.status(400).json({ message: 'La descripción no puede superar 255 caracteres.' });
   }
 
+  const client = await pool.connect();
+
   try {
-    const result = await pool.query(
+    await client.query('BEGIN');
+    await client.query("SELECT pg_advisory_xact_lock(hashtext('cash-box-key-generation'))");
+
+    const clave = await getNextCashBoxKey(client);
+    const result = await client.query(
       `
-      INSERT INTO cash_boxes (nombre, descripcion)
-      VALUES ($1, $2)
-      RETURNING id, nombre, descripcion, principal, activa, created_at, 0::integer AS movimientos_count
+      INSERT INTO cash_boxes (nombre, descripcion, clave)
+      VALUES ($1, $2, $3)
+      RETURNING id, nombre, descripcion, clave, principal, activa, created_at, 0::integer AS movimientos_count
       `,
-      [nombre, descripcion],
+      [nombre, descripcion, clave],
     );
+
+    await client.query('COMMIT');
 
     return res.status(201).json(result.rows[0]);
   } catch (error) {
+    await client.query('ROLLBACK').catch(() => undefined);
+
     if (error.code === '23505') {
       return res.status(409).json({ message: 'Ya existe una caja con ese nombre.' });
     }
 
     console.error('Error al crear caja:', error);
     return res.status(500).json({ message: 'Error al crear la caja.' });
+  } finally {
+    client.release();
   }
 }
 
@@ -133,7 +179,7 @@ async function updateCashBox(req, res) {
       UPDATE cash_boxes
       SET nombre = $1, descripcion = $2, activa = $3
       WHERE id = $4
-      RETURNING id, nombre, descripcion, principal, activa, created_at,
+      RETURNING id, nombre, descripcion, clave, principal, activa, created_at,
         (SELECT COUNT(*)::integer FROM movements WHERE caja_id = cash_boxes.id) AS movimientos_count
       `,
       [nombre, descripcion, activa, id],
