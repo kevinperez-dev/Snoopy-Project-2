@@ -78,8 +78,8 @@ CREATE TABLE IF NOT EXISTS user_roles (
 INSERT INTO roles (clave, nombre, descripcion, nivel, es_sistema)
 VALUES
     ('admin', 'Administrador', 'Administra usuarios, roles, cajas y todos los registros.', 300, TRUE),
-    ('edicion', 'Edición', 'Opera y edita movimientos únicamente en las cajas asignadas.', 200, TRUE),
-    ('lectura', 'Lectura', 'Consulta y exporta información de las cajas asignadas.', 100, TRUE)
+    ('edicion', 'Edición', 'Opera y edita movimientos únicamente en las cajas autorizadas para su cuenta.', 200, TRUE),
+    ('lectura', 'Lectura', 'Consulta y exporta información autorizada para su cuenta.', 100, TRUE)
 ON CONFLICT (clave) DO UPDATE
 SET nombre = EXCLUDED.nombre,
     descripcion = EXCLUDED.descripcion,
@@ -91,19 +91,19 @@ VALUES
     ('users.manage', 'Administrar usuarios', 'Crear, editar, activar, desactivar y restablecer usuarios.', 'Usuarios'),
     ('roles.manage', 'Administrar roles', 'Configurar los permisos de roles personalizados.', 'Usuarios'),
     ('cash_boxes.read.all', 'Consultar todas las cajas', 'Consultar cualquier caja del sistema.', 'Cajas'),
-    ('cash_boxes.read.assigned', 'Consultar cajas asignadas', 'Consultar solamente cajas asignadas al usuario.', 'Cajas'),
+    ('cash_boxes.read.assigned', 'Consultar cajas', 'Consultar solamente las cajas autorizadas para el usuario.', 'Cajas'),
     ('cash_boxes.manage.all', 'Administrar cajas', 'Crear, editar, activar y asignar cajas.', 'Cajas'),
     ('movements.read.all', 'Consultar todos los movimientos', 'Consultar movimientos de cualquier caja.', 'Movimientos'),
-    ('movements.read.assigned', 'Consultar movimientos asignados', 'Consultar movimientos de cajas asignadas.', 'Movimientos'),
+    ('movements.read.assigned', 'Consultar movimientos', 'Consultar movimientos de las cajas autorizadas.', 'Movimientos'),
     ('movements.create.all', 'Registrar movimientos en cualquier caja', 'Registrar movimientos en todas las cajas.', 'Movimientos'),
-    ('movements.create.assigned', 'Registrar movimientos asignados', 'Registrar movimientos en cajas asignadas.', 'Movimientos'),
+    ('movements.create.assigned', 'Registrar movimientos', 'Registrar movimientos en las cajas autorizadas.', 'Movimientos'),
     ('movements.edit.all', 'Editar cualquier movimiento', 'Editar movimientos de cualquier caja.', 'Movimientos'),
-    ('movements.edit.assigned', 'Editar movimientos asignados', 'Editar movimientos de cajas asignadas.', 'Movimientos'),
+    ('movements.edit.assigned', 'Editar movimientos', 'Editar movimientos de las cajas autorizadas.', 'Movimientos'),
     ('movements.cancel.all', 'Cancelar movimientos', 'Cancelar movimientos de cualquier caja.', 'Movimientos'),
     ('reports.read.all', 'Consultar todos los reportes', 'Consultar reportes de cualquier caja.', 'Reportes'),
-    ('reports.read.assigned', 'Consultar reportes asignados', 'Consultar reportes de cajas asignadas.', 'Reportes'),
+    ('reports.read.assigned', 'Consultar reportes', 'Consultar reportes de las cajas autorizadas.', 'Reportes'),
     ('reports.export.all', 'Exportar todos los reportes', 'Exportar información de cualquier caja.', 'Reportes'),
-    ('reports.export.assigned', 'Exportar reportes asignados', 'Exportar información de cajas asignadas.', 'Reportes')
+    ('reports.export.assigned', 'Exportar reportes', 'Exportar información de las cajas autorizadas.', 'Reportes')
 ON CONFLICT (codigo) DO UPDATE
 SET nombre = EXCLUDED.nombre,
     descripcion = EXCLUDED.descripcion,

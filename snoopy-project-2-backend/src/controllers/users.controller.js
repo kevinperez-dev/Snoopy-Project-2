@@ -48,7 +48,7 @@ function validateUserData(payload, { isCreate = false } = {}) {
     const accessLevel = String(assignment?.access_level || 'editor').trim();
 
     if (!cashBoxId || !VALID_ACCESS_LEVELS.includes(accessLevel) || seenCashBoxes.has(cashBoxId)) {
-      return { error: 'Las cajas asignadas no son válidas.' };
+      return { error: 'Las cajas seleccionadas no son válidas.' };
     }
 
     seenCashBoxes.add(cashBoxId);
@@ -255,7 +255,7 @@ async function createUser(req, res) {
 
     if (!await validateAssignments(roleAssignments, client)) {
       await client.query('ROLLBACK');
-      return res.status(400).json({ message: 'Una o más cajas asignadas no existen.' });
+      return res.status(400).json({ message: 'Una o más cajas seleccionadas no existen.' });
     }
 
     const passwordHash = await bcrypt.hash(password, 12);
@@ -359,7 +359,7 @@ async function updateUser(req, res) {
 
     if (!await validateAssignments(roleAssignments, client)) {
       await client.query('ROLLBACK');
-      return res.status(400).json({ message: 'Una o más cajas asignadas no existen.' });
+      return res.status(400).json({ message: 'Una o más cajas seleccionadas no existen.' });
     }
 
     const changesSession = current.estado !== estado || current.role_key !== role.clave;

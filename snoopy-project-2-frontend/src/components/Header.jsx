@@ -1,7 +1,7 @@
 // Archivo: src/components/Header.jsx
 // Propósito: header general reutilizable con submenús para Movimientos y Reportes.
 
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useEffect, useRef, useState } from 'react';
 import { getCurrentUser, hasCurrentPermission, logoutSession } from '../utils/session.js';
 
@@ -13,6 +13,7 @@ function Header({
     onReportTypeChange
 }) {
     const navigate = useNavigate();
+    const location = useLocation();
     const [isMovementsMenuOpen, setIsMovementsMenuOpen] = useState(false);
     const [isReportsMenuOpen, setIsReportsMenuOpen] = useState(false);
     const [isSettingsMenuOpen, setIsSettingsMenuOpen] = useState(false);
@@ -163,6 +164,7 @@ function Header({
                     <Link
                         to="/inicio"
                         className={`top-nav-link ${activePage === 'inicio' ? 'active' : ''}`}
+                        data-guide-target="inicio"
                     >
                         <span className="material-icons-outlined top-nav-icon">dashboard</span>
                         <span>Inicio</span>
@@ -172,6 +174,7 @@ function Header({
                         <button
                             type="button"
                             className={`top-nav-link top-nav-dropdown-toggle ${activePage === 'movimientos' ? 'active' : ''}`}
+                            data-guide-target="movimientos"
                             onClick={toggleMovementsMenu}
                         >
                             <span className="top-nav-text">
@@ -206,6 +209,7 @@ function Header({
                         <button
                             type="button"
                             className={`top-nav-link top-nav-dropdown-toggle ${activePage === 'reportes' ? 'active' : ''}`}
+                            data-guide-target="reportes"
                             onClick={toggleReportsMenu}
                         >
                             <span className="top-nav-text">
@@ -250,6 +254,7 @@ function Header({
                             <button
                                 type="button"
                                 className={`top-nav-link top-nav-dropdown-toggle ${activePage === 'configuracion' ? 'active' : ''}`}
+                                data-guide-target="configuracion"
                                 onClick={toggleSettingsMenu}
                             >
                                 <span className="top-nav-text">
@@ -259,15 +264,15 @@ function Header({
                                 <span className="material-icons-outlined top-nav-mini-caret">expand_more</span>
                             </button>
                             <div className="top-nav-dropdown-menu">
-                                <Link to="/configuracion/cajas" className="top-nav-dropdown-item" onClick={closeMobileMenu}>
+                                <Link to="/configuracion/cajas" className={`top-nav-dropdown-item ${location.pathname === '/configuracion/cajas' ? 'active' : ''}`} onClick={closeMobileMenu}>
                                     <span className="material-icons-outlined">account_balance_wallet</span>
                                     Cajas
                                 </Link>
-                                {canManageUsers && <Link to="/configuracion/usuarios" className="top-nav-dropdown-item" onClick={closeMobileMenu}>
+                                {canManageUsers && <Link to="/configuracion/usuarios" className={`top-nav-dropdown-item ${location.pathname === '/configuracion/usuarios' ? 'active' : ''}`} onClick={closeMobileMenu}>
                                     <span className="material-icons-outlined">manage_accounts</span>
                                     Usuarios
                                 </Link>}
-                                {hasCurrentPermission('roles.manage') && <Link to="/configuracion/perfiles" className="top-nav-dropdown-item" onClick={closeMobileMenu}>
+                                {hasCurrentPermission('roles.manage') && <Link to="/configuracion/perfiles" className={`top-nav-dropdown-item ${location.pathname === '/configuracion/perfiles' ? 'active' : ''}`} onClick={closeMobileMenu}>
                                     <span className="material-icons-outlined">badge</span>
                                     Perfiles
                                 </Link>}
@@ -277,7 +282,7 @@ function Header({
                 </nav>
 
                 <div className="topbar-actions">
-                    <Link to="/activar-cuenta?guia=1" className="user-box header-guide-link" title="Repetir guía rápida">
+                    <Link to="/inicio?guia=1" className="user-box header-guide-link" title="Repetir guía rápida">
                         <span className="material-icons-outlined user-box-icon">help_outline</span>
                         <span>Guía</span>
                     </Link>
@@ -388,7 +393,7 @@ function Header({
                             <span>{getCurrentUser()}</span>
                         </div>
 
-                        <Link to="/activar-cuenta?guia=1" className="mobile-menu-logout" onClick={closeMobileMenu}>
+                        <Link to="/inicio?guia=1" className="mobile-menu-logout" onClick={closeMobileMenu}>
                             <span className="material-icons-outlined">help_outline</span>
                             <span>Repetir guía</span>
                         </Link>

@@ -1,6 +1,6 @@
 // Archivo: src/App.jsx
 // Propósito: definir las rutas principales del frontend sin cierre automático por inactividad.
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 
 import Login from './pages/Login.jsx';
 import Home from './pages/Home.jsx';
@@ -14,9 +14,13 @@ import { CashBoxProvider } from './context/CashBoxContext.jsx';
 import { getCurrentProfile, isAuthenticated } from './utils/session.js';
 
 function ProtectedRoute({ children }) {
+  const location = useLocation();
   if (!isAuthenticated()) return <Navigate to="/login" replace />;
   const profile = getCurrentProfile();
-  if (profile.must_change_password || profile.onboarding_status === 'pendiente') {
+  const isOnboardingGuide = location.pathname === '/inicio'
+    && new URLSearchParams(location.search).get('guia') === '1';
+
+  if (profile.must_change_password || (profile.onboarding_status === 'pendiente' && !isOnboardingGuide)) {
     return <Navigate to="/activar-cuenta" replace />;
   }
   return children;

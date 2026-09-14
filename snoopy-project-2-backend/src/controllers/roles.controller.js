@@ -41,7 +41,7 @@ function validateRolePayload(payload) {
   }
 
   if (!permissions.includes('cash_boxes.read.assigned') || !permissions.includes('movements.read.assigned')) {
-    return { error: 'Todo perfil debe poder consultar sus cajas y movimientos asignados.' };
+    return { error: 'Todo perfil debe poder consultar cajas y movimientos.' };
   }
 
   return { data: { nombre, descripcion, activa, permissions } };

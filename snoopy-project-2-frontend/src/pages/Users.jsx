@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header.jsx';
+import SelectDropdown from '../components/SelectDropdown.jsx';
 import Toast from '../components/ui/Toast.jsx';
 import { hasCurrentPermission, isAuthenticated } from '../utils/session.js';
 import {
@@ -48,7 +49,6 @@ function Users() {
 
   const loadData = async () => {
     try {
-      setIsLoading(true);
       const [usersData, configuration] = await Promise.all([getUsers(), getUsersConfiguration()]);
       setUsers(usersData);
       setRoles(configuration.roles || []);
@@ -71,7 +71,9 @@ function Users() {
       return;
     }
 
-    loadData();
+    // Es una carga inicial desde la API; no deriva estado del render actual.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void loadData();
   }, [navigate]);
 
   useEffect(() => {
@@ -136,7 +138,7 @@ function Users() {
       setToast({
         title: isEditing ? 'Usuario actualizado' : 'Usuario creado',
         text: isEditing
-          ? 'Los permisos y las cajas asignadas se actualizaron.'
+          ? 'Los permisos y el acceso a cajas se actualizaron.'
           : 'La cuenta iniciará con contraseña temporal y guía de bienvenida.',
         type: 'success',
       });
@@ -203,7 +205,11 @@ function Users() {
               </label>}
               <div className="users-form-two-columns">
                 <label>Perfil
-                  <select value={form.role_key} onChange={(event) => {
+                  <SelectDropdown
+                    id="userRole"
+                    value={form.role_key}
+                    options={roles.map((role) => ({ value: role.clave, label: role.nombre }))}
+                    onChange={(event) => {
                     const roleKey = event.target.value;
                     const accessLevel = getAssignmentLevel(roleKey);
                     setForm((current) => ({
@@ -211,20 +217,25 @@ function Users() {
                       role_key: roleKey,
                       cajas: current.cajas.map((cashBox) => ({ ...cashBox, access_level: accessLevel })),
                     }));
-                  }} disabled={isSaving}>
-                    {roles.map((role) => <option key={role.clave} value={role.clave}>{role.nombre}</option>)}
-                  </select>
+                    }}
+                    disabled={isSaving}
+                    ariaLabel="Perfil del usuario"
+                  />
                 </label>
                 <label>Estado
-                  <select value={form.estado} onChange={(event) => changeForm('estado', event.target.value)} disabled={isSaving}>
-                    <option value="activo">Activo</option>
-                    <option value="inactivo">Inactivo</option>
-                  </select>
+                  <SelectDropdown
+                    id="userStatus"
+                    value={form.estado}
+                    options={[{ value: 'activo', label: 'Activo' }, { value: 'inactivo', label: 'Inactivo' }]}
+                    onChange={(event) => changeForm('estado', event.target.value)}
+                    disabled={isSaving}
+                    ariaLabel="Estado del usuario"
+                  />
                 </label>
               </div>
               <fieldset className="users-box-assignment">
-                <legend>Cajas asignadas</legend>
-                <p>Administración tiene acceso global; para Edición y Lectura asigna al menos una caja. El nivel se toma del perfil elegido.</p>
+                <legend>Acceso a cajas</legend>
+                <p>Administración tiene acceso global; para Edición y Lectura selecciona al menos una caja. El nivel se toma del perfil elegido.</p>
                 <div className="users-box-assignment-list">
                   {cashBoxes.map((cashBox) => {
                     const assignment = form.cajas.find((item) => Number(item.cash_box_id) === Number(cashBox.id));
@@ -261,7 +272,7 @@ function Users() {
                   <div className="user-record-main">
                     <div className="user-record-title"><h3>{user.nombre}</h3><span className={`user-status ${user.estado}`}>{user.estado === 'activo' ? 'Activo' : 'Inactivo'}</span>{user.onboarding_status === 'pendiente' && <span className="user-status new">Nuevo</span>}</div>
                     <p>@{user.username} · <strong>{user.role_nombre || user.role_key}</strong></p>
-                    <div className="user-record-boxes">{user.role_key === 'admin' ? <span>Acceso a todas las cajas</span> : user.cajas?.length ? user.cajas.map((cashBox) => <span key={cashBox.cash_box_id}>{cashBox.nombre}</span>) : <span>Sin cajas asignadas</span>}</div>
+                    <div className="user-record-boxes">{user.role_key === 'admin' ? <span>Acceso a todas las cajas</span> : user.cajas?.length ? user.cajas.map((cashBox) => <span key={cashBox.cash_box_id}>{cashBox.nombre}</span>) : <span>Sin acceso a cajas</span>}</div>
                   </div>
                   <div className="user-record-actions">
                     <button type="button" className="btn-icon-action btn-edit-row" onClick={() => editUser(user)} title="Editar usuario"><span className="material-icons-outlined">edit</span></button>

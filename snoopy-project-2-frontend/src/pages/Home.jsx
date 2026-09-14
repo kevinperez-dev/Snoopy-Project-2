@@ -2,16 +2,17 @@
 // Propósito: vista inicial tipo Excel para control semanal de caja chica por moneda
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import Header from '../components/Header.jsx';
 import CashBoxSelector from '../components/CashBoxSelector.jsx';
+import PortalGuide from '../components/PortalGuide.jsx';
 import SelectDropdown from '../components/SelectDropdown.jsx';
 import { useCashBoxes } from '../hooks/useCashBoxes.js';
 import { getMovements } from '../services/movementsApi.js';
 import { getCurrentISOWeek, getISOWeekInfo, getISOWeekStart, getMaxAllowedWeekForYear, getWeekLabel, formatShortDate } from '../utils/dates.js';
 import { getCurrencyBucket, renderCurrencyAmount } from '../utils/money.js';
-import { isAuthenticated } from '../utils/session.js';
+import { getCurrentProfile, isAuthenticated } from '../utils/session.js';
 
 
 // Propósito: cargar el saldo inicial guardado por semana y moneda.
@@ -708,7 +709,10 @@ async function downloadExcelWithSummaryImage({ fileName, sheetName, weekText, su
 
 function Home() {
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
     const { activeCashBox, activeCashBoxId } = useCashBoxes();
+    const isGuideVisible = searchParams.get('guia') === '1';
+    const isOnboardingGuide = getCurrentProfile().onboarding_status === 'pendiente';
 
     // Movimientos cargados desde PostgreSQL
     const [records, setRecords] = useState([]);
@@ -1464,6 +1468,7 @@ function Home() {
                     </div>
                 </section>
             </main>
+            {isGuideVisible && <PortalGuide onboardingRequired={isOnboardingGuide} />}
         </>
     );
 }
