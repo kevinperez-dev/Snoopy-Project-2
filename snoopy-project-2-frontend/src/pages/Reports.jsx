@@ -28,7 +28,7 @@ import {
   isDollarCurrency,
   normalizeCurrencyName,
 } from '../utils/money.js';
-import { isAuthenticated } from '../utils/session.js';
+import { hasCurrentPermission, isAuthenticated } from '../utils/session.js';
 
 // Propósito: revisar si el movimiento tiene una edición guardada en movement_edits.
 function hasAmountAdjustment(record) {
@@ -260,6 +260,9 @@ function Reports({ reportType = 'ingreso' }) {
   });
 
   const activeSection = REPORT_SECTIONS[activeReportType];
+  const canEditMovements = hasCurrentPermission('movements.edit.all') || hasCurrentPermission('movements.edit.assigned');
+  const canCancelMovements = hasCurrentPermission('movements.cancel.all');
+  const canExportReports = hasCurrentPermission('reports.export.all') || hasCurrentPermission('reports.export.assigned');
   const isCanceledReport = activeReportType === 'cancelado';
 
   // Propósito: periodos visibles: año actual y anterior.
@@ -779,7 +782,7 @@ function Reports({ reportType = 'ingreso' }) {
                 Limpiar
               </button>
 
-              <button type="button" className="btn btn-export" onClick={exportReportTable}>
+              <button type="button" className="btn btn-export" onClick={exportReportTable} disabled={!canExportReports}>
                 <span className="material-icons-outlined">download</span>
                 Exportar
               </button>
@@ -954,6 +957,7 @@ function Reports({ reportType = 'ingreso' }) {
                         <td className="report-actions-cell">
                           <div className="report-row-actions" aria-label="Acciones del movimiento">
                             <>
+                              {canEditMovements &&
                                 <button
                                   type="button"
                                   className="btn-icon-action btn-edit-row"
@@ -964,6 +968,7 @@ function Reports({ reportType = 'ingreso' }) {
                                 >
                                   <span className="material-icons-outlined">edit</span>
                                 </button>
+                              }
 
                                 <button
                                   type="button"
@@ -975,7 +980,7 @@ function Reports({ reportType = 'ingreso' }) {
                                   <span className="material-icons-outlined">print</span>
                                 </button>
 
-                                <button
+                                {canCancelMovements && <button
                                   type="button"
                                   className="btn-icon-action btn-delete-row"
                                   onClick={() => openCancelModal(record)}
@@ -986,7 +991,7 @@ function Reports({ reportType = 'ingreso' }) {
                                   <span className="material-icons-outlined">
                                     {isDeletingCurrentRow ? 'hourglass_top' : 'block'}
                                   </span>
-                                </button>
+                                </button>}
                               </>
                           </div>
                         </td>

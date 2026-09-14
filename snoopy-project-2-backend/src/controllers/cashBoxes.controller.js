@@ -1,6 +1,11 @@
 // Controladores del catalogo configurable de cajas.
 
 const pool = require('../config/db');
+const {
+  getCashBoxScope,
+  hasPermission,
+  writeAuditLog,
+} = require('../services/accessControl');
 
 function numberToCashBoxKey(value) {
   let remaining = value;
@@ -36,7 +41,7 @@ async function getNextCashBoxKey(client) {
 }
 
 function requireAdmin(req, res, next) {
-  if (req.user?.role !== 'admin') {
+  if (!hasPermission(req.user, 'cash_boxes.manage.all')) {
     return res.status(403).json({
       message: 'Solo un administrador puede administrar las cajas.',
     });
@@ -58,6 +63,20 @@ function getValidId(req, res) {
 
 async function getCashBoxes(req, res) {
   try {
+    const scope = await getCashBoxScope(req.user, 'cash_boxes', 'read');
+
+    if (!scope.all && scope.cashBoxIds.length === 0) {
+      return res.json([]);
+    }
+
+    const scopeJoin = scope.all
+      ? ''
+      : 'INNER JOIN cash_box_members cbm_scope ON cbm_scope.cash_box_id = cb.id AND cbm_scope.user_id = $1';
+    const accessLevelColumn = scope.all
+      ? "'owner'::varchar AS access_level"
+      : 'MAX(cbm_scope.access_level) AS access_level';
+    const params = scope.all ? [] : [req.user.id];
+
     const result = await pool.query(`
       SELECT
         cb.id,
@@ -66,13 +85,16 @@ async function getCashBoxes(req, res) {
         cb.clave,
         cb.principal,
         cb.activa,
+        cb.owner_user_id,
         cb.created_at,
-        COUNT(m.id)::integer AS movimientos_count
+        COUNT(m.id)::integer AS movimientos_count,
+        ${accessLevelColumn}
       FROM cash_boxes cb
+      ${scopeJoin}
       LEFT JOIN movements m ON m.caja_id = cb.id
       GROUP BY cb.id
       ORDER BY cb.activa DESC, cb.id ASC
-    `);
+    `, params);
 
     res.json(result.rows);
   } catch (error) {
@@ -107,16 +129,34 @@ async function createCashBox(req, res) {
     const clave = await getNextCashBoxKey(client);
     const result = await client.query(
       `
-      INSERT INTO cash_boxes (nombre, descripcion, clave)
-      VALUES ($1, $2, $3)
-      RETURNING id, nombre, descripcion, clave, principal, activa, created_at, 0::integer AS movimientos_count
+      INSERT INTO cash_boxes (nombre, descripcion, clave, created_by, owner_user_id)
+      VALUES ($1, $2, $3, $4, $4)
+      RETURNING id, nombre, descripcion, clave, principal, activa, owner_user_id, created_at, 0::integer AS movimientos_count
       `,
-      [nombre, descripcion, clave],
+      [nombre, descripcion, clave, req.user.id],
     );
+
+    const cashBox = result.rows[0];
+
+    await client.query(
+      `
+        INSERT INTO cash_box_members (cash_box_id, user_id, access_level, assigned_by)
+        VALUES ($1, $2, 'owner', $2)
+      `,
+      [cashBox.id, req.user.id],
+    );
+
+    await writeAuditLog({
+      actorUserId: req.user.id,
+      action: 'cash_box.created',
+      entityType: 'cash_box',
+      entityId: cashBox.id,
+      detail: { nombre: cashBox.nombre, clave: cashBox.clave },
+    }, client);
 
     await client.query('COMMIT');
 
-    return res.status(201).json(result.rows[0]);
+    return res.status(201).json({ ...cashBox, access_level: 'owner' });
   } catch (error) {
     await client.query('ROLLBACK').catch(() => undefined);
 
@@ -184,6 +224,14 @@ async function updateCashBox(req, res) {
       `,
       [nombre, descripcion, activa, id],
     );
+
+    await writeAuditLog({
+      actorUserId: req.user.id,
+      action: 'cash_box.updated',
+      entityType: 'cash_box',
+      entityId: id,
+      detail: { nombre, activa },
+    });
 
     return res.json(result.rows[0]);
   } catch (error) {

@@ -11,19 +11,20 @@ const {
 } = require('../controllers/movements.controller');
 
 const authMiddleware = require('../middlewares/auth.middleware');
+const { requireAnyPermission, requirePermission } = require('../middlewares/authorization.middleware');
 
 const router = express.Router();
 
 // Propósito: todas las rutas de movimientos requieren sesión válida.
-router.get('/', authMiddleware, getMovements);
+router.get('/', authMiddleware, requireAnyPermission(['movements.read.all', 'movements.read.assigned']), getMovements);
 
 // Propósito: consultar historial completo de ajustes antes de rutas con parámetro :id.
-router.get('/edits/history', authMiddleware, getMovementEditHistory);
+router.get('/edits/history', authMiddleware, requireAnyPermission(['movements.read.all', 'movements.read.assigned']), getMovementEditHistory);
 
-router.post('/', authMiddleware, createMovement);
-router.put('/:id', authMiddleware, updateMovement);
+router.post('/', authMiddleware, requireAnyPermission(['movements.create.all', 'movements.create.assigned']), createMovement);
+router.put('/:id', authMiddleware, requireAnyPermission(['movements.edit.all', 'movements.edit.assigned']), updateMovement);
 
 // Propósito: esta ruta conserva DELETE para no romper el frontend, pero realiza cancelación lógica.
-router.delete('/:id', authMiddleware, deleteMovement);
+router.delete('/:id', authMiddleware, requirePermission('movements.cancel.all'), deleteMovement);
 
 module.exports = router;

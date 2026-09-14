@@ -75,10 +75,10 @@ function Login() {
       const user = result.user || {};
 
       // Propósito: guardar sesión temporal; se borra al cerrar la pestaña y vence por inactividad.
-      setLoginSession(user.username || form.username.trim(), result.token, user.role || 'admin');
+      setLoginSession(user, result.token, user.role || '');
 
-      // Propósito: enviar al usuario a la pantalla inicial.
-      navigate('/inicio', { replace: true });
+      // Una cuenta nueva debe proteger su contraseña temporal antes de operar.
+      navigate(user.must_change_password ? '/activar-cuenta' : '/inicio', { replace: true });
     } catch (error) {
       // Propósito: mostrar el error real en consola para depurar.
       console.error('No se pudo iniciar sesión:', error);

@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header.jsx';
 import Toast from '../components/ui/Toast.jsx';
 import { createCashBox, getCashBoxes, updateCashBox } from '../services/cashBoxesApi.js';
-import { getCurrentRole, isAuthenticated } from '../utils/session.js';
+import { hasCurrentPermission, isAuthenticated } from '../utils/session.js';
 import { useCashBoxes } from '../hooks/useCashBoxes.js';
 
 const EMPTY_FORM = {
@@ -42,7 +42,7 @@ function CashBoxes() {
       return;
     }
 
-    if (getCurrentRole() !== 'admin') {
+    if (!hasCurrentPermission('cash_boxes.manage.all')) {
       navigate('/inicio', { replace: true });
       return;
     }

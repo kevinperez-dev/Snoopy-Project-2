@@ -17,7 +17,7 @@ import {
   isCurrencySelected,
   isDollarCurrency,
 } from '../utils/money.js';
-import { isAuthenticated } from '../utils/session.js';
+import { hasCurrentPermission, isAuthenticated } from '../utils/session.js';
 
 import {
   createMovement,
@@ -134,6 +134,7 @@ function Dashboard() {
   });
 
   const config = modeConfig[type];
+  const canCreateMovement = hasCurrentPermission('movements.create.all') || hasCurrentPermission('movements.create.assigned');
   const previewInfo = getISOWeekInfo(form.fecha || getTodayISO());
   const previewConcept = formatStructuredConcept(form.descripcion);
 
@@ -314,6 +315,11 @@ function Dashboard() {
 
   // Guarda un movimiento usando el backend Express/PostgreSQL.
   const saveMovement = async () => {
+    if (!canCreateMovement) {
+      setToast({ title: 'Acceso de lectura', text: 'Tu perfil puede consultar movimientos, pero no registrar nuevos.', type: 'error' });
+      return;
+    }
+
     if (
       !form.fecha ||
       !form.nombre.trim() ||
@@ -455,6 +461,7 @@ function Dashboard() {
             <div className="card-header">
               <div>
                 <h2>Formulario de movimiento</h2>
+                {!canCreateMovement && <p className="dashboard-readonly-notice">Tu perfil es de lectura. Puedes consultar e imprimir registros, pero no crear movimientos.</p>}
               </div>
               <div className="dashboard-form-header-actions">
                 <span className="mode-pill">{config.pillText}</span>
@@ -533,6 +540,7 @@ Detalle: Zoto / Ramón`}
                         className={`currency-choice compact ${isCurrencySelected(form.moneda, currency.value) ? 'selected' : ''}`}
                         onClick={() => updateForm('moneda', currency.value)}
                         aria-pressed={isCurrencySelected(form.moneda, currency.value)}
+                        disabled={!canCreateMovement}
                       >
                         <span className="currency-choice-symbol">{currency.symbol}</span>
                         <span className="currency-choice-text">
@@ -546,7 +554,7 @@ Detalle: Zoto / Ramón`}
                 </div>
 
                 <div className="form-actions dashboard-form-actions">
-                  <button type="button" className="btn btn-light" onClick={clearForm}>
+                  <button type="button" className="btn btn-light" onClick={clearForm} disabled={!canCreateMovement}>
                     <span className="material-icons-outlined">cleaning_services</span>
                     Limpiar
                   </button>
@@ -555,7 +563,7 @@ Detalle: Zoto / Ramón`}
                     type="button"
                     className="btn btn-dark"
                     onClick={saveMovement}
-                    disabled={isSaving}
+                    disabled={isSaving || !canCreateMovement}
                   >
                     <span className="material-icons-outlined">save</span>
                     {isSaving ? 'Guardando...' : 'Guardar'}

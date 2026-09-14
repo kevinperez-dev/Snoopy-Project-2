@@ -3,7 +3,7 @@
 
 import { Link, useNavigate } from 'react-router-dom';
 import { useEffect, useRef, useState } from 'react';
-import { getCurrentRole, getCurrentUser, logoutSession } from '../utils/session.js';
+import { getCurrentUser, hasCurrentPermission, logoutSession } from '../utils/session.js';
 
 function Header({
     activePage = '',
@@ -15,9 +15,11 @@ function Header({
     const navigate = useNavigate();
     const [isMovementsMenuOpen, setIsMovementsMenuOpen] = useState(false);
     const [isReportsMenuOpen, setIsReportsMenuOpen] = useState(false);
+    const [isSettingsMenuOpen, setIsSettingsMenuOpen] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const topbarShellRef = useRef(null);
-    const isAdmin = getCurrentRole() === 'admin';
+    const isAdmin = hasCurrentPermission('cash_boxes.manage.all');
+    const canManageUsers = hasCurrentPermission('users.manage');
 
     // Propósito: cerrar los menús abiertos cuando el usuario hace clic fuera del encabezado.
     useEffect(() => {
@@ -25,6 +27,7 @@ function Header({
             if (!topbarShellRef.current?.contains(event.target)) {
                 setIsMovementsMenuOpen(false);
                 setIsReportsMenuOpen(false);
+                setIsSettingsMenuOpen(false);
                 setIsMobileMenuOpen(false);
             }
         };
@@ -33,6 +36,7 @@ function Header({
             if (event.key === 'Escape') {
                 setIsMovementsMenuOpen(false);
                 setIsReportsMenuOpen(false);
+                setIsSettingsMenuOpen(false);
                 setIsMobileMenuOpen(false);
             }
         };
@@ -58,6 +62,7 @@ function Header({
     const handleMovementClick = (type) => {
         setIsMovementsMenuOpen(false);
         setIsReportsMenuOpen(false);
+        setIsSettingsMenuOpen(false);
         setIsMobileMenuOpen(false);
 
         if (onMovementTypeChange) {
@@ -72,6 +77,7 @@ function Header({
     const handleReportClick = (type) => {
         setIsReportsMenuOpen(false);
         setIsMovementsMenuOpen(false);
+        setIsSettingsMenuOpen(false);
         setIsMobileMenuOpen(false);
 
         if (onReportTypeChange) {
@@ -96,12 +102,20 @@ function Header({
     const toggleMovementsMenu = () => {
         setIsMovementsMenuOpen((current) => !current);
         setIsReportsMenuOpen(false);
+        setIsSettingsMenuOpen(false);
     };
 
     // Abre o cierra el submenú de reportes y cierra el de movimientos.
     const toggleReportsMenu = () => {
         setIsReportsMenuOpen((current) => !current);
         setIsMovementsMenuOpen(false);
+        setIsSettingsMenuOpen(false);
+    };
+
+    const toggleSettingsMenu = () => {
+        setIsSettingsMenuOpen((current) => !current);
+        setIsMovementsMenuOpen(false);
+        setIsReportsMenuOpen(false);
     };
 
     // Propósito: abrir o cerrar el menú compacto usado en celulares.
@@ -109,6 +123,7 @@ function Header({
         setIsMobileMenuOpen((current) => !current);
         setIsMovementsMenuOpen(false);
         setIsReportsMenuOpen(false);
+        setIsSettingsMenuOpen(false);
     };
 
     // Propósito: cerrar el menú móvil al navegar a Inicio.
@@ -116,6 +131,7 @@ function Header({
         setIsMobileMenuOpen(false);
         setIsMovementsMenuOpen(false);
         setIsReportsMenuOpen(false);
+        setIsSettingsMenuOpen(false);
     };
 
     return (
@@ -230,17 +246,41 @@ function Header({
                     </div>
 
                     {isAdmin && (
-                        <Link
-                            to="/configuracion/cajas"
-                            className={`top-nav-link ${activePage === 'configuracion' ? 'active' : ''}`}
-                        >
-                            <span className="material-icons-outlined top-nav-icon">tune</span>
-                            <span>Configuración</span>
-                        </Link>
+                        <div className={`top-nav-dropdown ${isSettingsMenuOpen ? 'open' : ''}`}>
+                            <button
+                                type="button"
+                                className={`top-nav-link top-nav-dropdown-toggle ${activePage === 'configuracion' ? 'active' : ''}`}
+                                onClick={toggleSettingsMenu}
+                            >
+                                <span className="top-nav-text">
+                                    <span className="material-icons-outlined top-nav-icon">tune</span>
+                                    <span>Configuración</span>
+                                </span>
+                                <span className="material-icons-outlined top-nav-mini-caret">expand_more</span>
+                            </button>
+                            <div className="top-nav-dropdown-menu">
+                                <Link to="/configuracion/cajas" className="top-nav-dropdown-item" onClick={closeMobileMenu}>
+                                    <span className="material-icons-outlined">account_balance_wallet</span>
+                                    Cajas
+                                </Link>
+                                {canManageUsers && <Link to="/configuracion/usuarios" className="top-nav-dropdown-item" onClick={closeMobileMenu}>
+                                    <span className="material-icons-outlined">manage_accounts</span>
+                                    Usuarios
+                                </Link>}
+                                {hasCurrentPermission('roles.manage') && <Link to="/configuracion/perfiles" className="top-nav-dropdown-item" onClick={closeMobileMenu}>
+                                    <span className="material-icons-outlined">badge</span>
+                                    Perfiles
+                                </Link>}
+                            </div>
+                        </div>
                     )}
                 </nav>
 
                 <div className="topbar-actions">
+                    <Link to="/activar-cuenta?guia=1" className="user-box header-guide-link" title="Repetir guía rápida">
+                        <span className="material-icons-outlined user-box-icon">help_outline</span>
+                        <span>Guía</span>
+                    </Link>
                     <div className="user-box" title="Usuario activo">
                         <span className="material-icons-outlined user-box-icon">person</span>
                         <span>{getCurrentUser()}</span>
@@ -327,16 +367,31 @@ function Header({
 
                     <div className="mobile-menu-footer">
                         {isAdmin && (
-                            <Link to="/configuracion/cajas" className="mobile-menu-logout" onClick={closeMobileMenu}>
-                                <span className="material-icons-outlined">tune</span>
-                                <span>Configuración</span>
-                            </Link>
+                            <>
+                                <Link to="/configuracion/cajas" className="mobile-menu-logout" onClick={closeMobileMenu}>
+                                    <span className="material-icons-outlined">account_balance_wallet</span>
+                                    <span>Cajas</span>
+                                </Link>
+                                {canManageUsers && <Link to="/configuracion/usuarios" className="mobile-menu-logout" onClick={closeMobileMenu}>
+                                    <span className="material-icons-outlined">manage_accounts</span>
+                                    <span>Usuarios</span>
+                                </Link>}
+                                {hasCurrentPermission('roles.manage') && <Link to="/configuracion/perfiles" className="mobile-menu-logout" onClick={closeMobileMenu}>
+                                    <span className="material-icons-outlined">badge</span>
+                                    <span>Perfiles</span>
+                                </Link>}
+                            </>
                         )}
 
                         <div className="mobile-menu-user" title="Usuario activo">
                             <span className="material-icons-outlined">person</span>
                             <span>{getCurrentUser()}</span>
                         </div>
+
+                        <Link to="/activar-cuenta?guia=1" className="mobile-menu-logout" onClick={closeMobileMenu}>
+                            <span className="material-icons-outlined">help_outline</span>
+                            <span>Repetir guía</span>
+                        </Link>
 
                         <button type="button" className="mobile-menu-logout" onClick={handleLogout}>
                             <span className="material-icons-outlined">logout</span>

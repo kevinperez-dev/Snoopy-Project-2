@@ -4,13 +4,27 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const pool = require('../config/db');
+const { getUserAccess, safeUser } = require('../services/accessControl');
+const { validatePassword } = require('../services/passwordPolicy');
 require('dotenv').config();
+
+function createSessionToken(user) {
+  return jwt.sign(
+    {
+      id: user.id,
+      tv: user.token_version,
+    },
+    process.env.JWT_SECRET,
+    { expiresIn: process.env.JWT_EXPIRES_IN || '8h' },
+  );
+}
 
 // Iniciar sesión
 async function login(req, res) {
   try {
     const requestBody = req.body && typeof req.body === 'object' ? req.body : {};
-    const { username, password } = requestBody;
+    const username = String(requestBody.username || '').trim().toLowerCase();
+    const password = requestBody.password;
 
     // Validar campos obligatorios
     if (!username || !password) {
@@ -26,9 +40,10 @@ async function login(req, res) {
         id,
         username,
         password_hash,
-        role
+        estado,
+        token_version
       FROM users
-      WHERE username = $1
+      WHERE LOWER(username) = $1
       LIMIT 1
       `,
       [username],
@@ -43,6 +58,12 @@ async function login(req, res) {
 
     const user = result.rows[0];
 
+    if (user.estado !== 'activo') {
+      return res.status(403).json({
+        message: 'Esta cuenta está inactiva. Solicita apoyo a un administrador.',
+      });
+    }
+
     // Comparar contraseña escrita contra contraseña encriptada
     const passwordIsValid = await bcrypt.compare(password, user.password_hash);
 
@@ -52,26 +73,22 @@ async function login(req, res) {
       });
     }
 
+    const userAccess = await getUserAccess(user.id);
+
+    if (!userAccess) {
+      return res.status(401).json({ message: 'No fue posible validar la cuenta.' });
+    }
+
+    await pool.query('UPDATE users SET last_login_at = CURRENT_TIMESTAMP WHERE id = $1', [user.id]);
+
     // Los tokens expiran para limitar el impacto de una sesión robada.
-    const token = jwt.sign(
-      {
-        id: user.id,
-        username: user.username,
-        role: user.role,
-      },
-      process.env.JWT_SECRET,
-      { expiresIn: process.env.JWT_EXPIRES_IN || '8h' },
-    );
+    const token = createSessionToken(userAccess);
 
     // Responder datos seguros del usuario
     res.json({
       message: 'Inicio de sesión correcto.',
       token,
-      user: {
-        id: user.id,
-        username: user.username,
-        role: user.role,
-      },
+      user: safeUser(userAccess),
     });
   } catch (error) {
     console.error('Error al iniciar sesión:', error);
@@ -84,11 +101,87 @@ async function login(req, res) {
 // Validar sesión actual
 async function me(req, res) {
   res.json({
-    user: req.user,
+    user: safeUser(req.user),
   });
+}
+
+async function changeOwnPassword(req, res) {
+  try {
+    const currentPassword = String(req.body?.current_password || '');
+    const newPassword = String(req.body?.new_password || '');
+    const passwordError = validatePassword(newPassword);
+
+    if (!currentPassword) {
+      return res.status(400).json({ message: 'Escribe tu contraseña actual o temporal.' });
+    }
+
+    if (passwordError) {
+      return res.status(400).json({ message: passwordError });
+    }
+
+    if (currentPassword === newPassword) {
+      return res.status(400).json({ message: 'La nueva contraseña debe ser diferente a la actual.' });
+    }
+
+    const currentResult = await pool.query(
+      'SELECT password_hash FROM users WHERE id = $1 LIMIT 1',
+      [req.user.id],
+    );
+
+    if (currentResult.rowCount === 0 || !await bcrypt.compare(currentPassword, currentResult.rows[0].password_hash)) {
+      return res.status(400).json({ message: 'La contraseña actual no es correcta.' });
+    }
+
+    const passwordHash = await bcrypt.hash(newPassword, 12);
+    await pool.query(
+      `
+        UPDATE users
+        SET password_hash = $1, must_change_password = FALSE, token_version = token_version + 1
+        WHERE id = $2
+      `,
+      [passwordHash, req.user.id],
+    );
+
+    const updatedUser = await getUserAccess(req.user.id);
+    return res.json({
+      message: 'Tu contraseña se actualizó correctamente.',
+      token: createSessionToken(updatedUser),
+      user: safeUser(updatedUser),
+    });
+  } catch (error) {
+    console.error('Error al cambiar contraseña:', error);
+    return res.status(500).json({ message: 'No fue posible actualizar la contraseña.' });
+  }
+}
+
+async function updateOnboarding(req, res) {
+  const status = String(req.body?.status || '').trim();
+
+  if (!['completado', 'omitido'].includes(status)) {
+    return res.status(400).json({ message: 'El estado de la guía no es válido.' });
+  }
+
+  try {
+    await pool.query(
+      `
+        UPDATE users
+        SET onboarding_status = $1
+        WHERE id = $2 AND onboarding_status = 'pendiente'
+      `,
+      [status, req.user.id],
+    );
+
+    const updatedUser = await getUserAccess(req.user.id);
+    return res.json({ user: safeUser(updatedUser) });
+  } catch (error) {
+    console.error('Error al actualizar guía inicial:', error);
+    return res.status(500).json({ message: 'No fue posible guardar el avance de la guía.' });
+  }
 }
 
 module.exports = {
   login,
   me,
+  changeOwnPassword,
+  updateOnboarding,
 };

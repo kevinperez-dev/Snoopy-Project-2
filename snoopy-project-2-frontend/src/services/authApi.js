@@ -109,3 +109,33 @@ export async function getCurrentSession() {
 
   return data;
 }
+
+export async function changeOwnPassword(currentPassword, newPassword) {
+  const response = await fetchWithTimeout(`${API_BASE_URL}/auth/password`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${getAuthToken()}`,
+    },
+    body: JSON.stringify({ current_password: currentPassword, new_password: newPassword }),
+  });
+
+  const data = await readJsonResponse(response);
+  if (!response.ok) throw new Error(getFriendlyAuthMessage(data.message));
+  return data;
+}
+
+export async function completeOnboarding(status = 'completado') {
+  const response = await fetchWithTimeout(`${API_BASE_URL}/auth/onboarding`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${getAuthToken()}`,
+    },
+    body: JSON.stringify({ status }),
+  });
+
+  const data = await readJsonResponse(response);
+  if (!response.ok) throw new Error(getFriendlyAuthMessage(data.message));
+  return data;
+}

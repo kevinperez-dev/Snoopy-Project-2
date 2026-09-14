@@ -7,6 +7,7 @@ export const STORAGE_KEYS = {
   user: 'snoopyProject2User',
   token: 'snoopyProject2Token',
   role: 'snoopyProject2Role',
+  profile: 'snoopyProject2Profile',
   lastActivity: 'snoopyProject2LastActivity',
 };
 
@@ -46,10 +47,17 @@ export function setLoginSession(user, token = '', role = '') {
     sessionStorage.removeItem(key);
   });
 
+  const profile = typeof user === 'object' && user !== null
+    ? user
+    : { username: user || '', role };
+  const username = profile.username || '';
+  const userRole = profile.role || role || '';
+
   localStorage.setItem(STORAGE_KEYS.auth, '1');
-  localStorage.setItem(STORAGE_KEYS.user, user || '');
+  localStorage.setItem(STORAGE_KEYS.user, username);
   localStorage.setItem(STORAGE_KEYS.token, token || '');
-  localStorage.setItem(STORAGE_KEYS.role, role || '');
+  localStorage.setItem(STORAGE_KEYS.role, userRole);
+  localStorage.setItem(STORAGE_KEYS.profile, JSON.stringify(profile));
   markSessionActivity();
   window.dispatchEvent(new Event('snoopy-auth-changed'));
 }
@@ -64,6 +72,15 @@ export function getCurrentUser() {
   return localStorage.getItem(STORAGE_KEYS.user) || '';
 }
 
+export function getCurrentProfile() {
+  try {
+    const profile = JSON.parse(localStorage.getItem(STORAGE_KEYS.profile) || '{}');
+    return profile && typeof profile === 'object' ? profile : {};
+  } catch {
+    return {};
+  }
+}
+
 // Propósito: cerrar sesión manualmente y borrar datos actuales y anteriores.
 export function logoutSession() {
   Object.values(STORAGE_KEYS).forEach((key) => {
@@ -74,5 +91,14 @@ export function logoutSession() {
 }
 
 export function getCurrentRole() {
-  return localStorage.getItem(STORAGE_KEYS.role) || '';
+  return getCurrentProfile().role || localStorage.getItem(STORAGE_KEYS.role) || '';
+}
+
+export function getCurrentPermissions() {
+  const permissions = getCurrentProfile().permissions;
+  return Array.isArray(permissions) ? permissions : [];
+}
+
+export function hasCurrentPermission(permission) {
+  return getCurrentPermissions().includes(permission);
 }

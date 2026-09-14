@@ -2,6 +2,11 @@
 // Propósito: controlar movimientos protegidos, cancelación lógica e historial de ediciones.
 
 const pool = require('../config/db');
+const {
+  canAccessCashBox,
+  getCashBoxScope,
+  writeAuditLog,
+} = require('../services/accessControl');
 
 // Tipos válidos que acepta la tabla movements.
 const VALID_TYPES = ['ingreso', 'egreso', 'cancelado'];
@@ -321,9 +326,30 @@ async function getMovements(req, res) {
       return res.status(400).json({ message: 'El identificador de la caja no es válido.' });
     }
 
-    const hasCashBoxFilter = hasCashBoxParameter;
-    const whereClause = hasCashBoxFilter ? 'WHERE m.caja_id = $1' : '';
-    const params = hasCashBoxFilter ? [cajaId] : [];
+    const scope = await getCashBoxScope(req.user, 'movements', 'read');
+
+    if (!scope.all && scope.cashBoxIds.length === 0) {
+      return res.json([]);
+    }
+
+    if (hasCashBoxParameter && !await canAccessCashBox(req.user, cajaId, 'movements', 'read')) {
+      return res.status(403).json({ message: 'No tienes acceso a la caja seleccionada.' });
+    }
+
+    const params = [];
+    const conditions = [];
+
+    if (hasCashBoxParameter) {
+      params.push(cajaId);
+      conditions.push(`m.caja_id = $${params.length}`);
+    }
+
+    if (!scope.all) {
+      params.push(scope.cashBoxIds);
+      conditions.push(`m.caja_id = ANY($${params.length}::int[])`);
+    }
+
+    const whereClause = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
 
     const result = await pool.query(`
       ${getMovementsWithLatestEditQuery(whereClause)}
@@ -366,8 +392,23 @@ async function getMovementEditHistory(req, res) {
     }
 
     if (hasCashBoxParameter) {
+      if (!await canAccessCashBox(req.user, cajaId, 'movements', 'read')) {
+        return res.status(403).json({ message: 'No tienes acceso a la caja seleccionada.' });
+      }
+
       params.push(cajaId);
       conditions.push(`m.caja_id = $${params.length}`);
+    }
+
+    const scope = await getCashBoxScope(req.user, 'movements', 'read');
+
+    if (!scope.all && scope.cashBoxIds.length === 0) {
+      return res.json([]);
+    }
+
+    if (!scope.all) {
+      params.push(scope.cashBoxIds);
+      conditions.push(`m.caja_id = ANY($${params.length}::int[])`);
     }
 
     const whereClause = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
@@ -454,6 +495,11 @@ async function createMovement(req, res) {
 
     await client.query('BEGIN');
 
+    if (!await canAccessCashBox(req.user, cajaId, 'movements', 'create', client)) {
+      await client.query('ROLLBACK');
+      return res.status(403).json({ message: 'No tienes permiso para registrar movimientos en esta caja.' });
+    }
+
     const cashBoxResult = await client.query(
       'SELECT id, clave FROM cash_boxes WHERE id = $1 AND activa = TRUE FOR SHARE',
       [cajaId],
@@ -484,6 +530,14 @@ async function createMovement(req, res) {
       `,
       [tipo, cajaId, fecha, folio, nombre, descripcion, cantidad, moneda, req.user.id],
     );
+
+    await writeAuditLog({
+      actorUserId: req.user.id,
+      action: 'movement.created',
+      entityType: 'movement',
+      entityId: result.rows[0].id,
+      detail: { caja_id: cajaId, tipo, folio, cantidad, moneda },
+    }, client);
 
     await client.query('COMMIT');
 
@@ -544,7 +598,7 @@ async function updateMovement(req, res) {
     // Propósito: bloquear el registro mientras se actualiza para guardar los valores anteriores correctos.
     const currentResult = await client.query(
       `
-      SELECT id, tipo, fecha, folio, nombre, descripcion, cantidad, moneda
+      SELECT id, caja_id, tipo, fecha, folio, nombre, descripcion, cantidad, moneda
       FROM movements
       WHERE id = $1
       FOR UPDATE
@@ -560,6 +614,11 @@ async function updateMovement(req, res) {
     }
 
     const currentMovement = currentResult.rows[0];
+
+    if (!await canAccessCashBox(req.user, currentMovement.caja_id, 'movements', 'edit', client)) {
+      await client.query('ROLLBACK');
+      return res.status(403).json({ message: 'No tienes permiso para editar este movimiento.' });
+    }
 
     if (currentMovement.tipo === 'cancelado') {
       await client.query('ROLLBACK');
@@ -668,6 +727,16 @@ async function updateMovement(req, res) {
       [tipo, fecha, folio, nombre, descripcion, cantidad, newCurrency, id],
     );
 
+    if (movementWasAdjusted) {
+      await writeAuditLog({
+        actorUserId: req.user.id,
+        action: 'movement.updated',
+        entityType: 'movement',
+        entityId: id,
+        detail: { caja_id: currentMovement.caja_id, folio },
+      }, client);
+    }
+
     await client.query('COMMIT');
 
     const updatedMovement = await getMovementWithLatestEditById(id);
@@ -710,6 +779,25 @@ async function deleteMovement(req, res) {
     const id = getValidMovementId(req, res);
     if (!id) return undefined;
 
+    const currentResult = await pool.query(
+      'SELECT id, caja_id, tipo, folio FROM movements WHERE id = $1 LIMIT 1',
+      [id],
+    );
+
+    if (currentResult.rowCount === 0) {
+      return res.status(404).json({ message: 'No se encontró el movimiento que deseas cancelar.' });
+    }
+
+    const currentMovement = currentResult.rows[0];
+
+    if (!await canAccessCashBox(req.user, currentMovement.caja_id, 'movements', 'cancel')) {
+      return res.status(403).json({ message: 'No tienes permiso para cancelar movimientos.' });
+    }
+
+    if (currentMovement.tipo === 'cancelado') {
+      return res.status(400).json({ message: 'El movimiento ya se encuentra cancelado.' });
+    }
+
     const result = await pool.query(
       `
       UPDATE movements
@@ -721,21 +809,18 @@ async function deleteMovement(req, res) {
     );
 
     if (result.rowCount === 0) {
-      const existingResult = await pool.query(
-        'SELECT tipo FROM movements WHERE id = $1',
-        [id],
-      );
-
-      if (existingResult.rowCount > 0 && existingResult.rows[0].tipo === 'cancelado') {
-        return res.status(400).json({
-          message: 'El movimiento ya se encuentra cancelado.',
-        });
-      }
-
-      return res.status(404).json({
-        message: 'No se encontró el movimiento que deseas cancelar.',
+      return res.status(409).json({
+        message: 'El movimiento cambió antes de poder cancelarse. Intenta nuevamente.',
       });
     }
+
+    await writeAuditLog({
+      actorUserId: req.user.id,
+      action: 'movement.cancelled',
+      entityType: 'movement',
+      entityId: id,
+      detail: { caja_id: currentMovement.caja_id, folio: currentMovement.folio },
+    });
 
     const movement = await getMovementWithLatestEditById(id);
 
