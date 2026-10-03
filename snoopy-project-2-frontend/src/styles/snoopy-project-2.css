@@ -6512,6 +6512,18 @@ body.modo-cancelado .report-table thead th {
   text-decoration: none;
 }
 
+.header-updates-link {
+  border-color: #b2ddff;
+  background: #eff8ff;
+  color: #175cd3;
+}
+
+.header-updates-link:hover {
+  border-color: #84caff;
+  background: #d1e9ff;
+  color: #175cd3;
+}
+
 .users-page-header {
   align-items: flex-start;
 }
@@ -7271,7 +7283,7 @@ body.modo-cancelado .report-table thead th {
   }
 }
 
-/* Perfiles: texto uniforme y capacidades entendibles para el usuario. */
+/* Roles: texto uniforme y capacidades entendibles para el usuario. */
 .roles-page .roles-permissions legend {
   font-size: 0.94rem;
 }
@@ -7711,6 +7723,50 @@ body.modo-cancelado .report-table thead th {
 
 .portal-guide-actions .btn {
   min-height: 38px;
+}
+
+.updates-guide-popover .portal-guide-icon,
+.updates-guide-popover .portal-guide-submodules span {
+  background: #eff8ff;
+  color: #175cd3;
+}
+
+/* En vistas completas, la guía se vuelve una tarjeta discreta para no cubrir formularios ni listados. */
+.updates-guide-overlay-full-view .portal-guide-popover {
+  top: auto !important;
+  right: 22px;
+  bottom: 22px;
+  left: auto !important;
+  width: min(320px, calc(100vw - 32px));
+  padding: 16px;
+}
+
+.updates-guide-overlay-full-view .portal-guide-popover::before {
+  display: none;
+}
+
+.updates-guide-overlay-full-view .portal-guide-icon {
+  width: 36px;
+  height: 36px;
+  margin-bottom: 9px;
+  border-radius: 10px;
+}
+
+.updates-guide-overlay-full-view .portal-guide-icon .material-icons-outlined {
+  font-size: 20px;
+}
+
+.updates-guide-overlay-full-view .portal-guide-popover > p:not(.portal-guide-progress) {
+  font-size: 0.84rem;
+  line-height: 1.42;
+}
+
+.updates-guide-overlay-full-view .portal-guide-submodules {
+  margin-top: 12px;
+}
+
+.updates-guide-overlay-full-view .portal-guide-actions {
+  margin-top: 14px;
 }
 
 @media (max-width: 720px) {

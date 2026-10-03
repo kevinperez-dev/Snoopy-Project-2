@@ -18,22 +18,20 @@ function normalizeUsername(value) {
 }
 
 function validateUserData(payload, { isCreate = false } = {}) {
-  const nombre = String(payload.nombre || '').trim();
   const username = normalizeUsername(payload.username);
+  // Se mantiene la columna nombre por compatibilidad con instalaciones previas,
+  // pero la cuenta se identifica únicamente por su usuario.
+  const nombre = username;
   const roleKey = String(payload.role_key || '').trim();
   const estado = String(payload.estado || 'activo').trim();
   const assignments = Array.isArray(payload.cajas) ? payload.cajas : [];
-
-  if (!nombre || nombre.length > 120) {
-    return { error: 'Indica un nombre de entre 1 y 120 caracteres.' };
-  }
 
   if (!/^[a-z0-9._-]{3,50}$/.test(username)) {
     return { error: 'El usuario debe tener entre 3 y 50 caracteres: letras, números, punto, guion o guion bajo.' };
   }
 
   if (!roleKey) {
-    return { error: 'Selecciona un perfil de acceso.' };
+    return { error: 'Selecciona un rol de usuario.' };
   }
 
   if (!VALID_STATUSES.includes(estado)) {

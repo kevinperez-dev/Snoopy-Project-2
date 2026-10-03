@@ -274,7 +274,7 @@ function Header({
                                 </Link>}
                                 {hasCurrentPermission('roles.manage') && <Link to="/configuracion/perfiles" className={`top-nav-dropdown-item ${location.pathname === '/configuracion/perfiles' ? 'active' : ''}`} onClick={closeMobileMenu}>
                                     <span className="material-icons-outlined">badge</span>
-                                    Perfiles
+                                    Roles
                                 </Link>}
                             </div>
                         </div>
@@ -282,6 +282,10 @@ function Header({
                 </nav>
 
                 <div className="topbar-actions">
+                    <Link to="/inicio?novedades=1" className="user-box header-guide-link header-updates-link" title="Ver las funciones nuevas">
+                        <span className="material-icons-outlined user-box-icon">new_releases</span>
+                        <span>Novedades</span>
+                    </Link>
                     <Link to="/inicio?guia=1" className="user-box header-guide-link" title="Repetir guía rápida">
                         <span className="material-icons-outlined user-box-icon">help_outline</span>
                         <span>Guía</span>
@@ -383,7 +387,7 @@ function Header({
                                 </Link>}
                                 {hasCurrentPermission('roles.manage') && <Link to="/configuracion/perfiles" className="mobile-menu-logout" onClick={closeMobileMenu}>
                                     <span className="material-icons-outlined">badge</span>
-                                    <span>Perfiles</span>
+                                    <span>Roles</span>
                                 </Link>}
                             </>
                         )}
@@ -396,6 +400,11 @@ function Header({
                         <Link to="/inicio?guia=1" className="mobile-menu-logout" onClick={closeMobileMenu}>
                             <span className="material-icons-outlined">help_outline</span>
                             <span>Repetir guía</span>
+                        </Link>
+
+                        <Link to="/inicio?novedades=1" className="mobile-menu-logout" onClick={closeMobileMenu}>
+                            <span className="material-icons-outlined">new_releases</span>
+                            <span>Ver novedades</span>
                         </Link>
 
                         <button type="button" className="mobile-menu-logout" onClick={handleLogout}>

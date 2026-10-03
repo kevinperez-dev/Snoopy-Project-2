@@ -1,4 +1,4 @@
-// Propósito: administrar perfiles personalizados desde la configuración.
+// Propósito: administrar roles personalizados desde la configuración.
 
 import { getAuthToken } from '../utils/session.js';
 
@@ -16,7 +16,7 @@ async function request(path, options = {}) {
   }
 
   const data = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(data.message || 'No se pudo completar la operación del perfil.');
+  if (!response.ok) throw new Error(data.message || 'No se pudo completar la operación del rol.');
   return data;
 }
 

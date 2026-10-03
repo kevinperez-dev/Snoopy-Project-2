@@ -10,6 +10,7 @@ import CashBoxes from './pages/CashBoxes.jsx';
 import Users from './pages/Users.jsx';
 import Roles from './pages/Roles.jsx';
 import AccountSetup from './pages/AccountSetup.jsx';
+import UpdatesGuide from './components/UpdatesGuide.jsx';
 import { CashBoxProvider } from './context/CashBoxContext.jsx';
 import { getCurrentProfile, isAuthenticated } from './utils/session.js';
 
@@ -31,10 +32,19 @@ function AccountSetupRoute() {
   return <AccountSetup />;
 }
 
+function GlobalGuides() {
+  const location = useLocation();
+  const isUpdatesGuideOpen = isAuthenticated()
+    && new URLSearchParams(location.search).get('novedades') === '1';
+
+  return isUpdatesGuideOpen ? <UpdatesGuide /> : null;
+}
+
 function App() {
   return (
     <BrowserRouter>
       <CashBoxProvider>
+        <GlobalGuides />
         <Routes>
         <Route path="/" element={<Navigate to="/inicio" replace />} />
 

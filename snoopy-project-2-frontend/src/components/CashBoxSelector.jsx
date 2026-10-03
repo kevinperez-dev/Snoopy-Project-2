@@ -14,7 +14,7 @@ function CashBoxSelector({ label = 'Caja', className = '' }) {
   const activeBoxes = cashBoxes.filter((cashBox) => cashBox.activa);
 
   return (
-    <div className={`filter-box cash-box-page-selector ${className}`.trim()}>
+    <div className={`filter-box cash-box-page-selector ${className}`.trim()} data-guide-target="selector-caja">
       <label htmlFor="pageCashBoxSelector">{label}</label>
       <SelectDropdown
         id="pageCashBoxSelector"

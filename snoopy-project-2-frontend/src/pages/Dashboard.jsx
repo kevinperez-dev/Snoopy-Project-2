@@ -316,7 +316,7 @@ function Dashboard() {
   // Guarda un movimiento usando el backend Express/PostgreSQL.
   const saveMovement = async () => {
     if (!canCreateMovement) {
-      setToast({ title: 'Acceso de lectura', text: 'Tu perfil puede consultar movimientos, pero no registrar nuevos.', type: 'error' });
+      setToast({ title: 'Acceso de lectura', text: 'Tu rol puede consultar movimientos, pero no registrar nuevos.', type: 'error' });
       return;
     }
 
@@ -461,7 +461,7 @@ function Dashboard() {
             <div className="card-header">
               <div>
                 <h2>Formulario de movimiento</h2>
-                {!canCreateMovement && <p className="dashboard-readonly-notice">Tu perfil es de lectura. Puedes consultar e imprimir registros, pero no crear movimientos.</p>}
+                {!canCreateMovement && <p className="dashboard-readonly-notice">Tu rol es de lectura. Puedes consultar e imprimir registros, pero no crear movimientos.</p>}
               </div>
               <div className="dashboard-form-header-actions">
                 <span className="mode-pill">{config.pillText}</span>

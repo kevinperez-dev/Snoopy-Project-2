@@ -1351,7 +1351,7 @@ function Home() {
                             </div>
                         </div>
                     </div>
-                    <div className="home-table-panel">
+                    <div className="home-table-panel" data-guide-target="novedades-folios">
                         <div className="home-table-actions-row">
                             <span className="home-table-actions-title">Registros mostrados</span>
 

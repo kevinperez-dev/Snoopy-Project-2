@@ -34,7 +34,7 @@ const SETTINGS_STEP = {
   icon: 'tune',
   title: 'Configuración',
   description: 'Administra las cajas y los accesos del equipo. Este módulo solo aparece cuando tu cuenta tiene permisos de administración.',
-  submodules: ['Cajas', 'Usuarios', 'Perfiles'],
+  submodules: ['Cajas', 'Usuarios', 'Roles'],
 };
 
 function getPopoverPosition(target) {

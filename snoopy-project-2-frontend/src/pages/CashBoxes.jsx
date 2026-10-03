@@ -129,7 +129,7 @@ function CashBoxes() {
       <Header activePage="configuracion" />
 
       <main className="page-wrapper cash-boxes-page">
-        <section className="page-header screenshot-style-header">
+        <section className="page-header screenshot-style-header" data-guide-target="novedades-cajas">
           <div>
             <h1>Configuración de cajas</h1>
             <p>Administra las cajas disponibles sin mezclar sus movimientos ni saldos.</p>

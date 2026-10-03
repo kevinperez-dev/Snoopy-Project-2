@@ -1,4 +1,4 @@
-// Propósito: permitir que un administrador gestione cuentas, perfiles y cajas asignadas.
+// Propósito: permitir que un administrador gestione cuentas, roles y cajas asignadas.
 
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -16,7 +16,6 @@ import {
 
 const EMPTY_FORM = {
   id: null,
-  nombre: '',
   username: '',
   password: '',
   role_key: 'edicion',
@@ -101,7 +100,6 @@ function Users() {
   const editUser = (user) => {
     setForm({
       id: user.id,
-      nombre: user.nombre || '',
       username: user.username || '',
       password: '',
       role_key: user.role_key || 'edicion',
@@ -120,7 +118,9 @@ function Users() {
     try {
       setIsSaving(true);
       const payload = {
-        nombre: form.nombre.trim(),
+        // El nombre técnico se conserva por compatibilidad con registros anteriores,
+        // pero siempre sigue el mismo valor del usuario visible en el portal.
+        nombre: form.username.trim(),
         username: form.username.trim(),
         role_key: form.role_key,
         estado: form.estado,
@@ -171,7 +171,7 @@ function Users() {
     <>
       <Header activePage="configuracion" />
       <main className="page-wrapper users-page">
-        <section className="page-header screenshot-style-header users-page-header">
+        <section className="page-header screenshot-style-header users-page-header" data-guide-target="novedades-usuarios">
           <div>
             <p className="section-eyebrow">Configuración</p>
             <h1>Usuarios y accesos</h1>
@@ -188,23 +188,20 @@ function Users() {
             <div className="card-header">
               <div>
                 <h2>{isEditing ? 'Editar usuario' : 'Nuevo usuario'}</h2>
-                <p>{isEditing ? 'Los cambios de perfil o estado cierran la sesión vigente de esa cuenta.' : 'La primera vez deberá cambiar su contraseña y completar una guía breve.'}</p>
+                <p>{isEditing ? 'Los cambios de rol o estado cierran la sesión vigente de esa cuenta.' : 'La primera vez deberá cambiar su contraseña y completar una guía breve.'}</p>
               </div>
               {isEditing && <button type="button" className="btn btn-light btn-small" onClick={() => setForm(EMPTY_FORM)}>Cancelar</button>}
             </div>
             <div className="users-form-body">
-              <label>Nombre visible
-                <input value={form.nombre} onChange={(event) => changeForm('nombre', event.target.value)} maxLength="120" required disabled={isSaving} placeholder="Ej. María López" />
-              </label>
               <label>Usuario
-                <input value={form.username} onChange={(event) => changeForm('username', event.target.value.toLowerCase())} maxLength="50" required disabled={isSaving} placeholder="maria.lopez" autoComplete="off" />
+                <input value={form.username} onChange={(event) => changeForm('username', event.target.value.toLowerCase())} maxLength="50" required disabled={isSaving} placeholder="Ej. maria.lopez" autoComplete="off" />
               </label>
               {!isEditing && <label>Contraseña temporal
                 <input type="password" value={form.password} onChange={(event) => changeForm('password', event.target.value)} required disabled={isSaving} autoComplete="new-password" />
                 <small>Mínimo 10 caracteres, con una letra y un número.</small>
               </label>}
               <div className="users-form-two-columns">
-                <label>Perfil
+                <label>Rol de usuario
                   <SelectDropdown
                     id="userRole"
                     value={form.role_key}
@@ -219,7 +216,7 @@ function Users() {
                     }));
                     }}
                     disabled={isSaving}
-                    ariaLabel="Perfil del usuario"
+                    ariaLabel="Rol de usuario"
                   />
                 </label>
                 <label>Estado
@@ -235,7 +232,7 @@ function Users() {
               </div>
               <fieldset className="users-box-assignment">
                 <legend>Acceso a cajas</legend>
-                <p>Administración tiene acceso global; para Edición y Lectura selecciona al menos una caja. El nivel se toma del perfil elegido.</p>
+                <p>Administración tiene acceso global; para Edición y Lectura selecciona al menos una caja. El acceso se determina por el rol elegido.</p>
                 <div className="users-box-assignment-list">
                   {cashBoxes.map((cashBox) => {
                     const assignment = form.cajas.find((item) => Number(item.cash_box_id) === Number(cashBox.id));
@@ -268,10 +265,10 @@ function Users() {
             <div className="users-list">
               {isLoading ? <p className="users-empty">Cargando usuarios...</p> : users.length === 0 ? <p className="users-empty">Todavía no hay usuarios registrados.</p> : users.map((user) => (
                 <article className={`user-record ${user.estado !== 'activo' ? 'inactive' : ''}`} key={user.id}>
-                  <div className="user-record-avatar">{String(user.nombre || user.username).slice(0, 1).toUpperCase()}</div>
+                  <div className="user-record-avatar">{String(user.username).slice(0, 1).toUpperCase()}</div>
                   <div className="user-record-main">
-                    <div className="user-record-title"><h3>{user.nombre}</h3><span className={`user-status ${user.estado}`}>{user.estado === 'activo' ? 'Activo' : 'Inactivo'}</span>{user.onboarding_status === 'pendiente' && <span className="user-status new">Nuevo</span>}</div>
-                    <p>@{user.username} · <strong>{user.role_nombre || user.role_key}</strong></p>
+                    <div className="user-record-title"><h3>{user.username}</h3><span className={`user-status ${user.estado}`}>{user.estado === 'activo' ? 'Activo' : 'Inactivo'}</span>{user.onboarding_status === 'pendiente' && <span className="user-status new">Nuevo</span>}</div>
+                    <p><strong>{user.role_nombre || user.role_key}</strong></p>
                     <div className="user-record-boxes">{user.role_key === 'admin' ? <span>Acceso a todas las cajas</span> : user.cajas?.length ? user.cajas.map((cashBox) => <span key={cashBox.cash_box_id}>{cashBox.nombre}</span>) : <span>Sin acceso a cajas</span>}</div>
                   </div>
                   <div className="user-record-actions">
@@ -290,7 +287,7 @@ function Users() {
           <button type="button" className="report-modal-close" onClick={() => setResetTarget(null)} aria-label="Cerrar">×</button>
           <span className="material-icons-outlined">lock_reset</span>
           <h2 id="resetPasswordTitle">Restablecer contraseña</h2>
-          <p>Asigna una contraseña temporal a <strong>{resetTarget.nombre}</strong>. Sus sesiones activas se cerrarán y deberá cambiarla al iniciar.</p>
+          <p>Asigna una contraseña temporal a <strong>{resetTarget.username}</strong>. Sus sesiones activas se cerrarán y deberá cambiarla al iniciar.</p>
           <label>Nueva contraseña temporal
             <input type="password" value={resetPassword} onChange={(event) => setResetPassword(event.target.value)} autoFocus required disabled={isSaving} autoComplete="new-password" />
           </label>
