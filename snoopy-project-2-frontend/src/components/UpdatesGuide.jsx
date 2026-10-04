@@ -29,7 +29,6 @@ const UPDATE_STEPS = [
     description: 'Aquí se crean, editan y activan las cajas. La caja principal siempre permanece disponible para conservar los registros importantes.',
     highlights: ['Cajas independientes', 'Caja principal protegida'],
     permission: 'cash_boxes.manage.all',
-    fullView: true,
   },
   {
     path: '/configuracion/usuarios',
@@ -39,7 +38,6 @@ const UPDATE_STEPS = [
     description: 'Desde este apartado creas cuentas, asignas un rol y defines las cajas a las que cada persona puede acceder.',
     highlights: ['Cuentas de equipo', 'Acceso por caja'],
     permission: 'users.manage',
-    fullView: true,
   },
   {
     path: '/configuracion/perfiles',
@@ -49,7 +47,6 @@ const UPDATE_STEPS = [
     description: 'Los roles determinan lo que puede hacer cada cuenta. Administrador gestiona todo; Edición registra movimientos y Lectura solo consulta la información autorizada.',
     highlights: ['Administrador', 'Edición', 'Lectura'],
     permission: 'roles.manage',
-    fullView: true,
   },
 ];
 
@@ -136,8 +133,8 @@ function UpdatesGuide() {
   };
 
   return (
-    <div className={`portal-guide-overlay updates-guide-overlay ${currentStep.fullView ? 'updates-guide-overlay-full-view' : ''}`} role="presentation">
-      {!currentStep.fullView && <div className="portal-guide-spotlight" style={position.highlight} />}
+    <div className="portal-guide-overlay updates-guide-overlay" role="presentation">
+      <div className="portal-guide-spotlight" style={position.highlight} />
       <section
         className={`portal-guide-popover portal-guide-popover-${position.placement} updates-guide-popover`}
         style={{ left: position.left, top: position.top }}

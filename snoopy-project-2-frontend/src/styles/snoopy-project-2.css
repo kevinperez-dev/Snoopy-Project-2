@@ -5187,7 +5187,7 @@ body.modo-cancelado .report-table thead th {
    Propósito: evitar que el logo, navegación y acciones se amontonen
    en anchos intermedios; desde tablet/celular se usa un menú desplegable.
 ========================================================= */
-@media (max-width: 900px) {
+@media (max-width: 1280px) {
   .topbar {
     min-height: auto;
     padding: 12px 16px;
@@ -7669,7 +7669,7 @@ body.modo-cancelado .report-table thead th {
 .portal-guide-progress {
   margin: 0 0 5px;
   color: #175cd3;
-  font-size: 0.75rem;
+  font-size: 0.82rem;
   font-weight: 800;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -7678,14 +7678,14 @@ body.modo-cancelado .report-table thead th {
 .portal-guide-popover h2 {
   margin: 0;
   color: #101828;
-  font-size: 1.25rem;
+  font-size: 1.38rem;
 }
 
 .portal-guide-popover > p:not(.portal-guide-progress) {
   margin: 9px 0 0;
   color: #667085;
-  font-size: 0.91rem;
-  line-height: 1.55;
+  font-size: 1rem;
+  line-height: 1.6;
 }
 
 .portal-guide-submodules {
@@ -7700,7 +7700,7 @@ body.modo-cancelado .report-table thead th {
   border-radius: 7px;
   background: #eff8ff;
   color: #175cd3;
-  font-size: 0.76rem;
+  font-size: 0.82rem;
   font-weight: 700;
 }
 
@@ -7723,50 +7723,13 @@ body.modo-cancelado .report-table thead th {
 
 .portal-guide-actions .btn {
   min-height: 38px;
+  font-size: 0.94rem;
 }
 
 .updates-guide-popover .portal-guide-icon,
 .updates-guide-popover .portal-guide-submodules span {
   background: #eff8ff;
   color: #175cd3;
-}
-
-/* En vistas completas, la guía se vuelve una tarjeta discreta para no cubrir formularios ni listados. */
-.updates-guide-overlay-full-view .portal-guide-popover {
-  top: auto !important;
-  right: 22px;
-  bottom: 22px;
-  left: auto !important;
-  width: min(320px, calc(100vw - 32px));
-  padding: 16px;
-}
-
-.updates-guide-overlay-full-view .portal-guide-popover::before {
-  display: none;
-}
-
-.updates-guide-overlay-full-view .portal-guide-icon {
-  width: 36px;
-  height: 36px;
-  margin-bottom: 9px;
-  border-radius: 10px;
-}
-
-.updates-guide-overlay-full-view .portal-guide-icon .material-icons-outlined {
-  font-size: 20px;
-}
-
-.updates-guide-overlay-full-view .portal-guide-popover > p:not(.portal-guide-progress) {
-  font-size: 0.84rem;
-  line-height: 1.42;
-}
-
-.updates-guide-overlay-full-view .portal-guide-submodules {
-  margin-top: 12px;
-}
-
-.updates-guide-overlay-full-view .portal-guide-actions {
-  margin-top: 14px;
 }
 
 @media (max-width: 720px) {

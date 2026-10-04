@@ -286,10 +286,6 @@ function Header({
                         <span className="material-icons-outlined user-box-icon">new_releases</span>
                         <span>Novedades</span>
                     </Link>
-                    <Link to="/inicio?guia=1" className="user-box header-guide-link" title="Repetir guía rápida">
-                        <span className="material-icons-outlined user-box-icon">help_outline</span>
-                        <span>Guía</span>
-                    </Link>
                     <div className="user-box" title="Usuario activo">
                         <span className="material-icons-outlined user-box-icon">person</span>
                         <span>{getCurrentUser()}</span>
@@ -396,11 +392,6 @@ function Header({
                             <span className="material-icons-outlined">person</span>
                             <span>{getCurrentUser()}</span>
                         </div>
-
-                        <Link to="/inicio?guia=1" className="mobile-menu-logout" onClick={closeMobileMenu}>
-                            <span className="material-icons-outlined">help_outline</span>
-                            <span>Repetir guía</span>
-                        </Link>
 
                         <Link to="/inicio?novedades=1" className="mobile-menu-logout" onClick={closeMobileMenu}>
                             <span className="material-icons-outlined">new_releases</span>
