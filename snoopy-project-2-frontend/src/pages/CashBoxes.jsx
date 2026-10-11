@@ -5,7 +5,12 @@ import { useNavigate } from 'react-router-dom';
 
 import Header from '../components/Header.jsx';
 import Toast from '../components/ui/Toast.jsx';
-import { createCashBox, getCashBoxes, updateCashBox } from '../services/cashBoxesApi.js';
+import {
+  createCashBox,
+  deleteCashBox,
+  getCashBoxes,
+  updateCashBox,
+} from '../services/cashBoxesApi.js';
 import { hasCurrentPermission, isAuthenticated } from '../utils/session.js';
 import { useCashBoxes } from '../hooks/useCashBoxes.js';
 
@@ -23,6 +28,7 @@ function CashBoxes() {
   const [form, setForm] = useState(EMPTY_FORM);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [deletingCashBoxId, setDeletingCashBoxId] = useState(null);
   const [toast, setToast] = useState(null);
 
   const loadCashBoxes = async () => {
@@ -124,6 +130,32 @@ function CashBoxes() {
     }
   };
 
+  const removeCashBox = async (cashBox) => {
+    if (!cashBox.can_delete || deletingCashBoxId) return;
+
+    const confirmed = window.confirm(`¿Eliminar la caja “${cashBox.nombre}”? Esta acción no se puede deshacer.`);
+    if (!confirmed) return;
+
+    try {
+      setDeletingCashBoxId(cashBox.id);
+      await deleteCashBox(cashBox.id);
+      if (Number(form.id) === Number(cashBox.id)) {
+        setForm(EMPTY_FORM);
+      }
+      await loadCashBoxes();
+      await reloadCashBoxes();
+      setToast({
+        title: 'Caja eliminada',
+        text: 'La caja inactiva sin registros se eliminó correctamente.',
+        type: 'success',
+      });
+    } catch (error) {
+      setToast({ title: 'Aviso', text: error.message, type: 'error' });
+    } finally {
+      setDeletingCashBoxId(null);
+    }
+  };
+
   return (
     <>
       <Header activePage="configuracion" />
@@ -141,7 +173,7 @@ function CashBoxes() {
             <div className="card-header">
               <div>
                 <h2>{form.id ? 'Editar caja' : 'Nueva caja'}</h2>
-                <p className="report-section-description">Las cajas con movimientos se pueden desactivar, pero no eliminar.</p>
+                <p className="report-section-description">Una caja solo se puede eliminar si está inactiva y no tiene movimientos ni historial de balanza.</p>
               </div>
             </div>
 
@@ -232,6 +264,17 @@ function CashBoxes() {
                       <button type="button" className="btn btn-light cash-box-toggle" onClick={() => toggleCashBox(cashBox)} disabled={cashBox.principal}>
                         {cashBox.principal ? 'Siempre activa' : cashBox.activa ? 'Desactivar' : 'Activar'}
                       </button>
+                      {cashBox.can_delete && (
+                        <button
+                          type="button"
+                          className="btn-icon-action btn-delete-row"
+                          onClick={() => removeCashBox(cashBox)}
+                          disabled={deletingCashBoxId === cashBox.id}
+                          title="Eliminar caja inactiva sin registros"
+                        >
+                          <span className="material-icons-outlined">delete</span>
+                        </button>
+                      )}
                     </div>
                   </article>
                 ))

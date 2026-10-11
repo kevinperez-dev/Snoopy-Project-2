@@ -58,3 +58,9 @@ export async function updateCashBox(id, cashBox) {
     body: JSON.stringify(cashBox),
   });
 }
+
+export async function deleteCashBox(id) {
+  return request(`/cajas/${id}`, {
+    method: 'DELETE',
+  });
+}

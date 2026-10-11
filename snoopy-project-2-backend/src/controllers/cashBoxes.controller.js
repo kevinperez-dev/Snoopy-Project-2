@@ -88,6 +88,13 @@ async function getCashBoxes(req, res) {
         cb.owner_user_id,
         cb.created_at,
         COUNT(m.id)::integer AS movimientos_count,
+        (SELECT COUNT(*)::integer FROM balance_sessions bs WHERE bs.caja_id = cb.id) AS balance_sessions_count,
+        (
+          cb.principal = FALSE
+          AND cb.activa = FALSE
+          AND NOT EXISTS (SELECT 1 FROM movements movement_record WHERE movement_record.caja_id = cb.id)
+          AND NOT EXISTS (SELECT 1 FROM balance_sessions balance_record WHERE balance_record.caja_id = cb.id)
+        ) AS can_delete,
         ${accessLevelColumn}
       FROM cash_boxes cb
       ${scopeJoin}
@@ -131,7 +138,10 @@ async function createCashBox(req, res) {
       `
       INSERT INTO cash_boxes (nombre, descripcion, clave, created_by, owner_user_id)
       VALUES ($1, $2, $3, $4, $4)
-      RETURNING id, nombre, descripcion, clave, principal, activa, owner_user_id, created_at, 0::integer AS movimientos_count
+      RETURNING id, nombre, descripcion, clave, principal, activa, owner_user_id, created_at,
+        0::integer AS movimientos_count,
+        0::integer AS balance_sessions_count,
+        FALSE AS can_delete
       `,
       [nombre, descripcion, clave, req.user.id],
     );
@@ -220,7 +230,14 @@ async function updateCashBox(req, res) {
       SET nombre = $1, descripcion = $2, activa = $3
       WHERE id = $4
       RETURNING id, nombre, descripcion, clave, principal, activa, created_at,
-        (SELECT COUNT(*)::integer FROM movements WHERE caja_id = cash_boxes.id) AS movimientos_count
+        (SELECT COUNT(*)::integer FROM movements WHERE caja_id = cash_boxes.id) AS movimientos_count,
+        (SELECT COUNT(*)::integer FROM balance_sessions WHERE caja_id = cash_boxes.id) AS balance_sessions_count,
+        (
+          cash_boxes.principal = FALSE
+          AND cash_boxes.activa = FALSE
+          AND NOT EXISTS (SELECT 1 FROM movements WHERE caja_id = cash_boxes.id)
+          AND NOT EXISTS (SELECT 1 FROM balance_sessions WHERE caja_id = cash_boxes.id)
+        ) AS can_delete
       `,
       [nombre, descripcion, activa, id],
     );
@@ -244,9 +261,86 @@ async function updateCashBox(req, res) {
   }
 }
 
+async function deleteCashBox(req, res) {
+  const id = getValidId(req, res);
+  if (!id) return undefined;
+
+  const client = await pool.connect();
+
+  try {
+    await client.query('BEGIN');
+
+    const currentResult = await client.query(
+      'SELECT id, nombre, principal, activa FROM cash_boxes WHERE id = $1 FOR UPDATE',
+      [id],
+    );
+
+    if (currentResult.rowCount === 0) {
+      await client.query('ROLLBACK');
+      return res.status(404).json({ message: 'No se encontró la caja.' });
+    }
+
+    const cashBox = currentResult.rows[0];
+
+    if (cashBox.principal) {
+      await client.query('ROLLBACK');
+      return res.status(400).json({ message: 'La caja principal no se puede eliminar.' });
+    }
+
+    if (cashBox.activa) {
+      await client.query('ROLLBACK');
+      return res.status(400).json({ message: 'Desactiva la caja antes de eliminarla.' });
+    }
+
+    const relatedRecords = await client.query(
+      `
+        SELECT
+          (SELECT COUNT(*)::integer FROM movements WHERE caja_id = $1) AS movimientos_count,
+          (SELECT COUNT(*)::integer FROM balance_sessions WHERE caja_id = $1) AS balance_sessions_count
+      `,
+      [id],
+    );
+    const records = relatedRecords.rows[0];
+
+    if (Number(records.movimientos_count) > 0 || Number(records.balance_sessions_count) > 0) {
+      await client.query('ROLLBACK');
+      return res.status(409).json({
+        message: 'No se puede eliminar una caja con movimientos o historial de balanza.',
+      });
+    }
+
+    await client.query('DELETE FROM cash_boxes WHERE id = $1', [id]);
+
+    await writeAuditLog({
+      actorUserId: req.user.id,
+      action: 'cash_box.deleted',
+      entityType: 'cash_box',
+      entityId: id,
+      detail: { nombre: cashBox.nombre },
+    }, client);
+
+    await client.query('COMMIT');
+    return res.status(204).send();
+  } catch (error) {
+    await client.query('ROLLBACK').catch(() => undefined);
+
+    if (error.code === '23503') {
+      return res.status(409).json({
+        message: 'No se puede eliminar una caja con registros relacionados.',
+      });
+    }
+
+    console.error('Error al eliminar caja:', error);
+    return res.status(500).json({ message: 'Error al eliminar la caja.' });
+  } finally {
+    client.release();
+  }
+}
+
 module.exports = {
   requireAdmin,
   getCashBoxes,
   createCashBox,
   updateCashBox,
+  deleteCashBox,
 };

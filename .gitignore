@@ -31,3 +31,6 @@ pnpm-debug.log*
 # Archivos temporales
 *.tmp
 *.temp
+
+# Respaldos locales de producción: nunca versionar datos reales.
+.local-backups/
