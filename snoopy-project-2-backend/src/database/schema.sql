@@ -25,13 +25,36 @@ ALTER TABLE cash_boxes ADD COLUMN IF NOT EXISTS principal BOOLEAN NOT NULL DEFAU
 ALTER TABLE cash_boxes ADD COLUMN IF NOT EXISTS clave VARCHAR(10);
 ALTER TABLE cash_boxes ALTER COLUMN clave TYPE VARCHAR(10);
 
+-- En instalaciones existentes puede haber nombres con diferente capitalización.
+-- Solo agrega las cajas base si no existe ya una equivalente y no reemplaza
+-- la caja principal que ya tenga historial.
 INSERT INTO cash_boxes (nombre, descripcion, principal, clave)
-VALUES
-    ('Caja normal', 'Caja principal de la operacion diaria.', TRUE, 'A'),
-    ('Caja invitados', 'Caja separada para movimientos de invitados o personas externas.', FALSE, 'B')
+SELECT 'Caja normal', 'Caja principal de la operacion diaria.', TRUE, 'A'
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM cash_boxes
+    WHERE LOWER(nombre) = LOWER('Caja normal')
+)
 ON CONFLICT (nombre) DO NOTHING;
 
-UPDATE cash_boxes SET principal = TRUE, activa = TRUE WHERE nombre = 'Caja normal';
+INSERT INTO cash_boxes (nombre, descripcion, principal, clave)
+SELECT 'Caja invitados', 'Caja separada para movimientos de invitados o personas externas.', FALSE, 'B'
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM cash_boxes
+    WHERE LOWER(nombre) = LOWER('Caja invitados')
+)
+ON CONFLICT (nombre) DO NOTHING;
+
+-- Una ejecución repetida nunca cambia cuál caja ya fue definida como principal.
+UPDATE cash_boxes
+SET principal = TRUE, activa = TRUE
+WHERE LOWER(nombre) = LOWER('Caja normal')
+  AND NOT EXISTS (
+      SELECT 1
+      FROM cash_boxes existing_box
+      WHERE existing_box.principal = TRUE
+  );
 
 UPDATE cash_boxes SET clave = 'A' WHERE principal = TRUE;
 
