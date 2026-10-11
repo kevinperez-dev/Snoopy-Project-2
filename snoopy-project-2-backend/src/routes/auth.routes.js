@@ -2,7 +2,7 @@
 // Propósito: definir rutas de autenticación del sistema
 
 const express = require('express');
-const { changeOwnPassword, login, me, updateOnboarding } = require('../controllers/auth.controller');
+const { login, me, updateOnboarding } = require('../controllers/auth.controller');
 const authMiddleware = require('../middlewares/auth.middleware');
 const { loginLimiter } = require('../middlewares/security');
 
@@ -13,7 +13,6 @@ router.post('/login', loginLimiter, login);
 
 // Ruta para validar sesión actual
 router.get('/me', authMiddleware, me);
-router.put('/password', authMiddleware, changeOwnPassword);
 router.put('/onboarding', authMiddleware, updateOnboarding);
 
 module.exports = router;

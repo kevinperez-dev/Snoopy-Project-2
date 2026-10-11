@@ -5,7 +5,6 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const pool = require('../config/db');
 const { getUserAccess, safeUser } = require('../services/accessControl');
-const { validatePassword } = require('../services/passwordPolicy');
 require('dotenv').config();
 
 function createSessionToken(user) {
@@ -105,55 +104,6 @@ async function me(req, res) {
   });
 }
 
-async function changeOwnPassword(req, res) {
-  try {
-    const currentPassword = String(req.body?.current_password || '');
-    const newPassword = String(req.body?.new_password || '');
-    const passwordError = validatePassword(newPassword);
-
-    if (!currentPassword) {
-      return res.status(400).json({ message: 'Escribe tu contraseña actual o temporal.' });
-    }
-
-    if (passwordError) {
-      return res.status(400).json({ message: passwordError });
-    }
-
-    if (currentPassword === newPassword) {
-      return res.status(400).json({ message: 'La nueva contraseña debe ser diferente a la actual.' });
-    }
-
-    const currentResult = await pool.query(
-      'SELECT password_hash FROM users WHERE id = $1 LIMIT 1',
-      [req.user.id],
-    );
-
-    if (currentResult.rowCount === 0 || !await bcrypt.compare(currentPassword, currentResult.rows[0].password_hash)) {
-      return res.status(400).json({ message: 'La contraseña actual no es correcta.' });
-    }
-
-    const passwordHash = await bcrypt.hash(newPassword, 12);
-    await pool.query(
-      `
-        UPDATE users
-        SET password_hash = $1, must_change_password = FALSE, token_version = token_version + 1
-        WHERE id = $2
-      `,
-      [passwordHash, req.user.id],
-    );
-
-    const updatedUser = await getUserAccess(req.user.id);
-    return res.json({
-      message: 'Tu contraseña se actualizó correctamente.',
-      token: createSessionToken(updatedUser),
-      user: safeUser(updatedUser),
-    });
-  } catch (error) {
-    console.error('Error al cambiar contraseña:', error);
-    return res.status(500).json({ message: 'No fue posible actualizar la contraseña.' });
-  }
-}
-
 async function updateOnboarding(req, res) {
   const status = String(req.body?.status || '').trim();
 
@@ -182,6 +132,5 @@ async function updateOnboarding(req, res) {
 module.exports = {
   login,
   me,
-  changeOwnPassword,
   updateOnboarding,
 };

@@ -262,7 +262,7 @@ async function createUser(req, res) {
         INSERT INTO users (
           username, nombre, password_hash, role, estado, must_change_password, onboarding_status, created_by
         )
-        VALUES ($1, $2, $3, $4, $5, TRUE, 'pendiente', $6)
+        VALUES ($1, $2, $3, $4, $5, FALSE, 'pendiente', $6)
         RETURNING id
       `,
       [username, nombre, passwordHash, role.clave, estado, req.user.id],
@@ -432,7 +432,7 @@ async function resetUserPassword(req, res) {
     await pool.query(
       `
         UPDATE users
-        SET password_hash = $1, must_change_password = TRUE, token_version = token_version + 1
+        SET password_hash = $1, must_change_password = FALSE, token_version = token_version + 1
         WHERE id = $2
       `,
       [passwordHash, userId],
@@ -446,7 +446,7 @@ async function resetUserPassword(req, res) {
       detail: { username: user.username },
     });
 
-    return res.json({ message: 'La contraseña temporal fue asignada y se cerraron sus sesiones activas.' });
+    return res.json({ message: 'La contraseña se actualizó y se cerraron sus sesiones activas.' });
   } catch (error) {
     console.error('Error al restablecer contraseña:', error);
     return res.status(500).json({ message: 'No fue posible restablecer la contraseña.' });

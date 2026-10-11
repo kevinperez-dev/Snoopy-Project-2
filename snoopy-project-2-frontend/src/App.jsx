@@ -9,7 +9,6 @@ import Reports from './pages/Reports.jsx';
 import CashBoxes from './pages/CashBoxes.jsx';
 import Users from './pages/Users.jsx';
 import Roles from './pages/Roles.jsx';
-import AccountSetup from './pages/AccountSetup.jsx';
 import UpdatesGuide from './components/UpdatesGuide.jsx';
 import { CashBoxProvider } from './context/CashBoxContext.jsx';
 import { getCurrentProfile, isAuthenticated } from './utils/session.js';
@@ -21,15 +20,10 @@ function ProtectedRoute({ children }) {
   const isOnboardingGuide = location.pathname === '/inicio'
     && new URLSearchParams(location.search).get('guia') === '1';
 
-  if (profile.must_change_password || (profile.onboarding_status === 'pendiente' && !isOnboardingGuide)) {
-    return <Navigate to="/activar-cuenta" replace />;
+  if (profile.onboarding_status === 'pendiente' && !isOnboardingGuide) {
+    return <Navigate to="/inicio?guia=1" replace />;
   }
   return children;
-}
-
-function AccountSetupRoute() {
-  if (!isAuthenticated()) return <Navigate to="/login" replace />;
-  return <AccountSetup />;
 }
 
 function GlobalGuides() {
@@ -49,7 +43,7 @@ function App() {
         <Route path="/" element={<Navigate to="/inicio" replace />} />
 
         <Route path="/login" element={<Login />} />
-        <Route path="/activar-cuenta" element={<AccountSetupRoute />} />
+        <Route path="/activar-cuenta" element={<Navigate to="/inicio?guia=1" replace />} />
         <Route path="/inicio" element={<ProtectedRoute><Home /></ProtectedRoute>} />
         <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
         <Route path="/cajas" element={<Navigate to="/configuracion/cajas" replace />} />

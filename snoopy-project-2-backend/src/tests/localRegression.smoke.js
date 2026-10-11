@@ -194,7 +194,7 @@ async function run() {
       method: 'POST',
       body: JSON.stringify({
         username,
-        password: 'TemporalQaUsuarioA1',
+        password: 'TemporalQaUsuarioA1!',
         role_key: 'lectura',
         estado: 'inactivo',
         cajas: [],

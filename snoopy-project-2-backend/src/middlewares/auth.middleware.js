@@ -40,16 +40,6 @@ async function authMiddleware(req, res, next) {
       });
     }
 
-    // Una contraseña temporal solo permite completar el cambio obligatorio.
-    // Así una cuenta nueva no puede operar antes de que su dueño asegure su acceso.
-    const isOwnPasswordChange = req.baseUrl === '/api/auth' && req.path === '/password' && req.method === 'PUT';
-    if (user.must_change_password && !isOwnPasswordChange) {
-      return res.status(403).json({
-        code: 'PASSWORD_CHANGE_REQUIRED',
-        message: 'Debes cambiar tu contraseña temporal antes de continuar.',
-      });
-    }
-
     req.user = user;
 
     return next();

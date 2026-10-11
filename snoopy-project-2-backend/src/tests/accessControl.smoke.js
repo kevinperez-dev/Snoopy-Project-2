@@ -50,10 +50,9 @@ async function run() {
   const suffix = `${Date.now()}`;
   const editorUsername = `qa_editor_${suffix}`;
   const readerUsername = `qa_reader_${suffix}`;
-  const editorTemporaryPassword = `TemporalEditor${suffix}A1`;
-  const editorNewPassword = `EditorSeguro${suffix}B2`;
-  const readerTemporaryPassword = `TemporalLectura${suffix}C3`;
-  const readerResetPassword = `Restablecida${suffix}D4`;
+  const editorPassword = `ClaveEditor${suffix}A1!`;
+  const readerPassword = `ClaveLectura${suffix}C3!`;
+  const readerResetPassword = `Restablecida${suffix}D4!`;
 
   const results = [];
   const adminLogin = await login(adminUsername, adminPassword);
@@ -140,7 +139,7 @@ async function run() {
     body: JSON.stringify({
       nombre: 'QA Edición',
       username: editorUsername,
-      password: editorTemporaryPassword,
+      password: editorPassword,
       role_key: customRoleUpdate.body.clave,
       estado: 'activo',
       cajas: [{ cash_box_id: normalCashBox.id, access_level: 'editor' }],
@@ -148,22 +147,13 @@ async function run() {
   }, adminToken);
   assert(editorCreation.response.status === 201, 'No se pudo crear un usuario de edición.');
   const editorId = editorCreation.body.id;
-  assert(editorCreation.body.must_change_password, 'El usuario nuevo no exige cambio de contraseña.');
+  assert(editorCreation.body.must_change_password === false, 'El usuario nuevo conservó el flujo de contraseña temporal.');
   assert(editorCreation.body.onboarding_status === 'pendiente', 'El usuario nuevo no quedó con guía pendiente.');
-  results.push('creación de usuario con contraseña temporal');
+  results.push('creación de usuario con contraseña definida por administración');
 
-  const editorLogin = await login(editorUsername, editorTemporaryPassword);
-  assert(editorLogin.response.status === 200, 'El usuario de edición no pudo iniciar con su contraseña temporal.');
-  const editorBlocked = await request('/cajas', {}, editorLogin.body.token);
-  assert(editorBlocked.response.status === 403 && editorBlocked.body.code === 'PASSWORD_CHANGE_REQUIRED', 'La contraseña temporal no bloqueó el acceso operativo.');
-
-  const editorPasswordChange = await request('/auth/password', {
-    method: 'PUT',
-    body: JSON.stringify({ current_password: editorTemporaryPassword, new_password: editorNewPassword }),
-  }, editorLogin.body.token);
-  assert(editorPasswordChange.response.status === 200, 'No se pudo cambiar la contraseña temporal.');
-  const editorToken = editorPasswordChange.body.token;
-  results.push('cambio obligatorio de contraseña');
+  const editorLogin = await login(editorUsername, editorPassword);
+  assert(editorLogin.response.status === 200, 'El usuario de edición no pudo iniciar con la contraseña asignada.');
+  const editorToken = editorLogin.body.token;
 
   const editorCashBoxes = await request('/cajas', {}, editorToken);
   assert(editorCashBoxes.response.status === 200, 'El usuario de edición no pudo consultar su caja.');
@@ -247,7 +237,7 @@ async function run() {
     body: JSON.stringify({
       nombre: 'QA Lectura',
       username: readerUsername,
-      password: readerTemporaryPassword,
+      password: readerPassword,
       role_key: 'lectura',
       estado: 'activo',
       // El servidor ignora un nivel visual incompatible y lo deriva del perfil.
@@ -258,14 +248,9 @@ async function run() {
   const readerId = readerCreation.body.id;
   assert(readerCreation.body.cajas?.[0]?.access_level === 'reader', 'Una cuenta de lectura conservó una etiqueta de acceso incompatible.');
 
-  const readerLogin = await login(readerUsername, readerTemporaryPassword);
+  const readerLogin = await login(readerUsername, readerPassword);
   assert(readerLogin.response.status === 200, 'El usuario de lectura no pudo iniciar sesión.');
-  const readerPasswordChange = await request('/auth/password', {
-    method: 'PUT',
-    body: JSON.stringify({ current_password: readerTemporaryPassword, new_password: `LecturaSegura${suffix}E5` }),
-  }, readerLogin.body.token);
-  assert(readerPasswordChange.response.status === 200, 'El usuario de lectura no pudo cambiar su contraseña temporal.');
-  const readerToken = readerPasswordChange.body.token;
+  const readerToken = readerLogin.body.token;
 
   const readerMovementCreation = await request('/movements', {
     method: 'POST',
@@ -288,7 +273,10 @@ async function run() {
   assert(resetReader.response.status === 200, 'No se pudo restablecer la contraseña del usuario de lectura.');
   const revokedReaderSession = await request('/auth/me', {}, readerToken);
   assert(revokedReaderSession.response.status === 401, 'El restablecimiento no invalidó la sesión anterior.');
-  results.push('lectura sin escritura y restablecimiento administrativo');
+  const readerLoginAfterReset = await login(readerUsername, readerResetPassword);
+  assert(readerLoginAfterReset.response.status === 200, 'El usuario de lectura no pudo usar la contraseña restablecida.');
+  assert(readerLoginAfterReset.body.user?.must_change_password === false, 'El restablecimiento conservó el cambio obligatorio de contraseña.');
+  results.push('lectura sin escritura y restablecimiento administrativo inmediato');
 
   const editorDeactivation = await request(`/users/${editorId}`, {
     method: 'PUT',
@@ -306,8 +294,7 @@ async function run() {
   results.push('desactivación inmediata de sesión');
 
   const secondAdminUsername = `qa_admin_two_${suffix}`;
-  const secondAdminTemporaryPassword = `TemporalAdmin${suffix}F6`;
-  const secondAdminNewPassword = `AdminSeguro${suffix}G7`;
+  const secondAdminPassword = `ClaveAdmin${suffix}F6!`;
 
   // La copia local puede traer administradores históricos. Para que la carrera
   // pruebe el borde real (exactamente dos administradores), se dejan inactivos
@@ -334,20 +321,15 @@ async function run() {
     body: JSON.stringify({
       nombre: 'QA Administrador dos',
       username: secondAdminUsername,
-      password: secondAdminTemporaryPassword,
+      password: secondAdminPassword,
       role_key: 'admin',
       estado: 'activo',
       cajas: [],
     }),
   }, adminToken);
   assert(secondAdminCreation.response.status === 201, 'No se pudo crear el segundo administrador para la prueba de concurrencia.');
-  const secondAdminLogin = await login(secondAdminUsername, secondAdminTemporaryPassword);
+  const secondAdminLogin = await login(secondAdminUsername, secondAdminPassword);
   assert(secondAdminLogin.response.status === 200, 'El segundo administrador no pudo iniciar sesión.');
-  const secondAdminPasswordChange = await request('/auth/password', {
-    method: 'PUT',
-    body: JSON.stringify({ current_password: secondAdminTemporaryPassword, new_password: secondAdminNewPassword }),
-  }, secondAdminLogin.body.token);
-  assert(secondAdminPasswordChange.response.status === 200, 'El segundo administrador no pudo cambiar su contraseña temporal.');
 
   const deactivatePrimaryAdmin = request(`/users/${adminLogin.body.user.id}`, {
     method: 'PUT',
@@ -358,7 +340,7 @@ async function run() {
       estado: 'inactivo',
       cajas: [],
     }),
-  }, secondAdminPasswordChange.body.token);
+  }, secondAdminLogin.body.token);
   const deactivateSecondAdmin = request(`/users/${secondAdminCreation.body.id}`, {
     method: 'PUT',
     body: JSON.stringify({
@@ -374,7 +356,7 @@ async function run() {
   const rejectedDeactivations = concurrentAdminUpdates.filter((result) => result.response.status === 400);
   assert(successfulDeactivations.length === 1 && rejectedDeactivations.length === 1, 'La protección concurrente del último administrador falló.');
   const survivingAdminToken = concurrentAdminUpdates[0].response.status === 200
-    ? secondAdminPasswordChange.body.token
+    ? secondAdminLogin.body.token
     : adminToken;
   const usersAfterRace = await request('/users', {}, survivingAdminToken);
   assert(usersAfterRace.response.status === 200, 'No se pudo comprobar el administrador restante.');

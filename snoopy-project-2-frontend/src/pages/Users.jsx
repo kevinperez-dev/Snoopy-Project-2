@@ -139,7 +139,7 @@ function Users() {
         title: isEditing ? 'Usuario actualizado' : 'Usuario creado',
         text: isEditing
           ? 'Los permisos y el acceso a cajas se actualizaron.'
-          : 'La cuenta iniciará con contraseña temporal y guía de bienvenida.',
+          : 'La contraseña queda lista para usarse. La guía de bienvenida se mostrará al primer acceso.',
         type: 'success',
       });
     } catch (error) {
@@ -188,7 +188,7 @@ function Users() {
             <div className="card-header">
               <div>
                 <h2>{isEditing ? 'Editar usuario' : 'Nuevo usuario'}</h2>
-                <p>{isEditing ? 'Los cambios de rol o estado cierran la sesión vigente de esa cuenta.' : 'La primera vez deberá cambiar su contraseña y completar una guía breve.'}</p>
+                <p>{isEditing ? 'Los cambios de rol o estado cierran la sesión vigente de esa cuenta.' : 'Define la contraseña inicial, el rol y las cajas autorizadas. La guía breve se mostrará al primer acceso.'}</p>
               </div>
               {isEditing && <button type="button" className="btn btn-light btn-small" onClick={() => setForm(EMPTY_FORM)}>Cancelar</button>}
             </div>
@@ -196,9 +196,9 @@ function Users() {
               <label>Usuario
                 <input value={form.username} onChange={(event) => changeForm('username', event.target.value.toLowerCase())} maxLength="50" required disabled={isSaving} placeholder="Ej. maria.lopez" autoComplete="off" />
               </label>
-              {!isEditing && <label>Contraseña temporal
+              {!isEditing && <label>Contraseña
                 <input type="password" value={form.password} onChange={(event) => changeForm('password', event.target.value)} required disabled={isSaving} autoComplete="new-password" />
-                <small>Mínimo 10 caracteres, con una letra y un número.</small>
+                <small>Mínimo 6 caracteres, con una letra, un número y un carácter especial.</small>
               </label>}
               <div className="users-form-two-columns">
                 <label>Rol de usuario
@@ -287,11 +287,11 @@ function Users() {
           <button type="button" className="report-modal-close" onClick={() => setResetTarget(null)} aria-label="Cerrar">×</button>
           <span className="material-icons-outlined">lock_reset</span>
           <h2 id="resetPasswordTitle">Restablecer contraseña</h2>
-          <p>Asigna una contraseña temporal a <strong>{resetTarget.username}</strong>. Sus sesiones activas se cerrarán y deberá cambiarla al iniciar.</p>
-          <label>Nueva contraseña temporal
+          <p>Define una nueva contraseña para <strong>{resetTarget.username}</strong>. Sus sesiones activas se cerrarán.</p>
+          <label>Nueva contraseña
             <input type="password" value={resetPassword} onChange={(event) => setResetPassword(event.target.value)} autoFocus required disabled={isSaving} autoComplete="new-password" />
           </label>
-          <small>Mínimo 10 caracteres, con una letra y un número.</small>
+          <small>Mínimo 6 caracteres, con una letra, un número y un carácter especial.</small>
           <div className="user-password-actions"><button type="button" className="btn btn-light" onClick={() => setResetTarget(null)} disabled={isSaving}>Cancelar</button><button type="submit" className="btn btn-primary" disabled={isSaving}>{isSaving ? 'Guardando...' : 'Restablecer'}</button></div>
         </form>
       </div>}

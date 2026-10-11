@@ -77,8 +77,8 @@ function Login() {
       // Propósito: guardar sesión temporal; se borra al cerrar la pestaña y vence por inactividad.
       setLoginSession(user, result.token, user.role || '');
 
-      // Una cuenta nueva debe proteger su contraseña temporal antes de operar.
-      navigate(user.must_change_password ? '/activar-cuenta' : '/inicio', { replace: true });
+      // La guía inicial es independiente de la contraseña que ya definió administración.
+      navigate(user.onboarding_status === 'pendiente' ? '/inicio?guia=1' : '/inicio', { replace: true });
     } catch (error) {
       // Propósito: mostrar el error real en consola para depurar.
       console.error('No se pudo iniciar sesión:', error);

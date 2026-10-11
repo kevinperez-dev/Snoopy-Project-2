@@ -12,10 +12,11 @@
     "seed:admin": "node src/database/seedAdmin.js",
     "create:user": "node src/database/createUser.js",
     "db:init": "node src/database/initDatabase.js",
-    "db:migrate": "node src/database/runSqlFile.js src/database/add_cash_boxes.sql && node src/database/runSqlFile.js src/database/add_balances.sql && node src/database/runSqlFile.js src/database/normalize_cash_boxes_before_folio.sql && node src/database/runSqlFile.js src/database/add_folio_cash_box_keys.sql && node src/database/runSqlFile.js src/database/add_user_access_control.sql",
+    "db:migrate": "node src/database/runSqlFile.js src/database/add_cash_boxes.sql && node src/database/runSqlFile.js src/database/add_balances.sql && node src/database/runSqlFile.js src/database/normalize_cash_boxes_before_folio.sql && node src/database/runSqlFile.js src/database/add_folio_cash_box_keys.sql && node src/database/runSqlFile.js src/database/add_user_access_control.sql && node src/database/runSqlFile.js src/database/remove_forced_password_change.sql",
     "db:setup": "npm run db:init && npm run db:migrate && npm run seed:admin",
     "test:access": "node src/tests/accessControl.smoke.js",
     "test:cash-box-deletion": "node src/tests/cashBoxDeletion.smoke.js",
+    "test:password-assignment": "node src/tests/passwordAssignment.smoke.js",
     "render:build": "npm install && npm run db:setup"
   },
   "dependencies": {
