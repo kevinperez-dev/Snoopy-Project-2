@@ -46,8 +46,8 @@ body {
   background: var(--color-bg);
   color: var(--color-text);
   font-family: 'Roboto', 'Segoe UI', Arial, sans-serif;
-  font-size: 14px;
-  line-height: 1.4;
+  font-size: 15px;
+  line-height: 1.45;
 }
 
 input,
@@ -79,7 +79,7 @@ button {
 
 .topbar-shell {
   width: 100%;
-  max-width: 1420px;
+  max-width: 1600px;
   display: grid;
   grid-template-columns: minmax(240px, auto) 1fr auto;
   align-items: center;
@@ -156,9 +156,9 @@ button {
 .top-nav-link {
   color: rgba(255, 255, 255, 0.88);
   text-decoration: none;
-  font-size: 0.88rem;
+  font-size: 0.96rem;
   font-weight: 500;
-  padding: 9px 13px;
+  padding: 10px 15px;
   border-radius: 999px;
   transition:
     background 0.2s ease,
@@ -171,7 +171,7 @@ button {
   align-items: center;
   justify-content: center;
   gap: 7px;
-  min-height: 38px;
+  min-height: 40px;
 }
 
 .top-nav-link:hover {
@@ -186,7 +186,7 @@ button {
 }
 
 .top-nav-icon {
-  font-size: 18px;
+  font-size: 19px;
 }
 
 .top-nav-text {
@@ -196,7 +196,7 @@ button {
 }
 
 .top-nav-mini-caret {
-  font-size: 18px;
+  font-size: 19px;
   opacity: 0.9;
   transition: transform 0.2s ease;
 }
@@ -258,7 +258,7 @@ button {
   text-align: left;
   text-decoration: none !important;
   font: inherit;
-  font-size: 0.86rem;
+  font-size: 0.93rem;
   font-weight: 700;
   cursor: pointer;
   transition:
@@ -297,12 +297,12 @@ body.modo-egreso #menuEgresos {
 }
 
 .user-box {
-  min-height: 38px;
+  min-height: 40px;
   display: inline-flex;
   align-items: center;
   gap: 7px;
   color: #ffffff;
-  font-size: 0.86rem;
+  font-size: 0.93rem;
   padding: 8px 12px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.07);
@@ -310,19 +310,19 @@ body.modo-egreso #menuEgresos {
 }
 
 .user-box-icon {
-  font-size: 18px;
+  font-size: 19px;
   opacity: 0.88;
 }
 
 .logout-link {
-  min-height: 38px;
+  min-height: 40px;
   border: 1px solid rgba(255, 255, 255, 0.13);
   background: rgba(255, 255, 255, 0.08);
   color: #ffffff;
   border-radius: 999px;
   padding: 8px 13px;
   text-decoration: none;
-  font-size: 0.86rem;
+  font-size: 0.93rem;
   display: inline-flex;
   align-items: center;
   gap: 7px;
@@ -338,16 +338,16 @@ body.modo-egreso #menuEgresos {
 }
 
 .logout-link .material-icons-outlined {
-  font-size: 18px;
+  font-size: 19px;
 }
 
 /* =========================================================
    CONTENIDO GENERAL
 ========================================================= */
 .page-wrapper {
-  max-width: 1420px;
+  max-width: 1600px;
   margin: 0 auto;
-  padding: 24px 22px 30px;
+  padding: 26px 28px 34px;
 }
 
 .page-header {
@@ -366,7 +366,8 @@ body.modo-egreso #menuEgresos {
 }
 
 .page-header p {
-  font-size: 0.95rem;
+  font-size: 1rem;
+  line-height: 1.5;
   color: var(--color-text-soft);
 }
 
@@ -949,8 +950,7 @@ body.modo-egreso .report-table thead th {
   width: 100%;
   padding: 16px 18px 4px 18px;
   overflow-x: auto;
-  display: flex;
-  justify-content: center;
+  display: block;
 }
 
 .history-table,
@@ -2290,7 +2290,8 @@ body.modo-egreso .report-section-tab.active .material-icons-outlined {
 
 .report-section-description {
   color: #666666;
-  font-size: 0.9rem;
+  font-size: 0.96rem;
+  line-height: 1.5;
   margin-top: 4px;
 }
 
@@ -2299,12 +2300,31 @@ body.modo-egreso .report-section-tab.active .material-icons-outlined {
 }
 
 @media (max-width: 768px) {
+  .reports-filters-separated {
+    grid-template-columns: 1fr;
+  }
+
   .report-section-tabs {
     grid-template-columns: 1fr;
   }
 
   .report-section-tab {
     min-height: 70px;
+  }
+}
+
+@media (max-width: 900px) {
+  .reports-header-actions {
+    width: 100%;
+  }
+
+  .reports-header-actions .btn {
+    min-width: 0;
+    flex: 1 1 0;
+  }
+
+  .reports-header-actions .btn-export {
+    width: auto;
   }
 }
 
@@ -4305,8 +4325,8 @@ body.modo-cancelado .report-table thead th {
 .home-control-intro p {
   margin: 6px 0 0;
   color: #667085;
-  font-size: 0.86rem;
-  line-height: 1.35;
+  font-size: 0.93rem;
+  line-height: 1.45;
 }
 
 /* Propósito: hacer que la etiqueta de saldo se vea ligera y no compita con el título. */
@@ -4535,8 +4555,8 @@ body.modo-cancelado .report-table thead th {
   display: block;
   margin-top: 7px;
   color: #64748b;
-  font-size: 0.78rem;
-  line-height: 1.35;
+  font-size: 0.84rem;
+  line-height: 1.45;
 }
 
 /* =========================================================
@@ -6502,7 +6522,7 @@ body.modo-cancelado .report-table thead th {
 .section-eyebrow {
   margin: 0 0 5px;
   color: #175cd3;
-  font-size: 0.74rem;
+  font-size: 0.8rem;
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
